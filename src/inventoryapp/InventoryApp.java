@@ -10,10 +10,14 @@ package inventoryapp;
  */
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
@@ -22,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -40,11 +45,16 @@ public class InventoryApp extends JFrame implements MouseListener{
 	 */
 	static InventoryApp program;
 	
+	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	
 	// stores the lines of the .csv file
 	ArrayList<String> inventoryLines = new ArrayList<String>();
 	
 	// stores the order of how to display scanned items
 	ArrayList<String> itemsOrder = new ArrayList<String>();
+	
+	// stores the sequence of scanned items in a stack
+	Deque<String> itemsStack = new ArrayDeque<>();
 	
 	/* stores the barcode and name of scanned items
 	 * 
@@ -66,9 +76,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 	// GUI elements
 	JLabel titleLabel, restockingLabel, barcodeLabel;
 	JTextArea itemsTextArea;
-	JButton homeButton, reorderButton, checkOutButton, receiveInventoryButton, newItemButton, doneButton, printButton;
+	JButton homeButton, reorderButton, checkOutButton, receiveInventoryButton, newItemButton, doneCheckOutButton, doneReceivingButton, printButton, undoButton;
 	JTextField barcodeTextField;
 	JScrollPane itemsScrollPane;
+	JPanel newItemPanel;
+	
+	int restockingNumber;
 	
 	InventoryApp(){
 		/**
@@ -76,8 +89,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 		 * 
 		 */
 		inventoryLines = readFile(System.getenv("INVENTORY_LIST"));
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		int restockingNumber = 0;
 		
 	    setTitle("Inventory Management Program");
 		setBounds(0,0,screenSize.width, screenSize.height);
@@ -115,10 +126,15 @@ public class InventoryApp extends JFrame implements MouseListener{
 		receiveInventoryButton.setFont(new Font("Arial", Font.BOLD, 36));
 		receiveInventoryButton.addMouseListener(this);
 		
-		doneButton = new JButton("Done");
-		doneButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		doneButton.setFont(new Font("Arial", Font.BOLD, 36));
-		doneButton.addMouseListener(this);
+		doneCheckOutButton = new JButton("Done");
+		doneCheckOutButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
+		doneCheckOutButton.setFont(new Font("Arial", Font.BOLD, 36));
+		doneCheckOutButton.addMouseListener(this);
+		
+		doneReceivingButton = new JButton("Done");
+		doneReceivingButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
+		doneReceivingButton.setFont(new Font("Arial", Font.BOLD, 36));
+		doneReceivingButton.addMouseListener(this);
 		
 		newItemButton = new JButton("New Item");
 		newItemButton.setBounds((int)(screenSize.width * 0.3), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
@@ -130,9 +146,15 @@ public class InventoryApp extends JFrame implements MouseListener{
 		printButton.setFont(new Font("Arial", Font.BOLD, 36));
 		printButton.addMouseListener(this);
 		
-		restockingLabel = new JLabel(restockingNumber + " item(s) need restocking");
+		undoButton = new JButton("Undo");
+		undoButton.setBounds((int)(screenSize.width * 0.525), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
+		undoButton.setFont(new Font("Arial", Font.BOLD, 36));
+		undoButton.addMouseListener(this);
+		
+		restockingLabel = new JLabel(restockingNumber + " item(s) needs restocking");
 		restockingLabel.setBounds((int)(screenSize.width * 0.6), (int)(screenSize.height * 0.075), screenSize.width/5, screenSize.height/10);
 		restockingLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		updateRestockingNumber();
 		
 		barcodeLabel = new JLabel("Barcode:");
 		barcodeLabel.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.75), screenSize.width/5, screenSize.height/20);
@@ -141,7 +163,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		barcodeTextField = new JTextField();
 		barcodeTextField.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
 		barcodeTextField.setFont(new Font("Arial", Font.BOLD, 48));
-		barcodeTextField.addActionListener(barcode);
+		barcodeTextField.addActionListener(barcodeScanned);
 		
 		// add elements to GUI
 		add(titleLabel);
@@ -152,17 +174,21 @@ public class InventoryApp extends JFrame implements MouseListener{
 		add(restockingLabel);
 		add(barcodeLabel);
 		add(barcodeTextField);
-		add(doneButton);
+		add(doneCheckOutButton);
+		add(doneReceivingButton);
 		add(printButton);
 		add(newItemButton);
+		add(undoButton);
 		add(itemsScrollPane);
 		
 		// show GUI home page on screen
 		barcodeLabel.setVisible(false);
 		barcodeTextField.setVisible(false);
-		doneButton.setVisible(false);
+		doneCheckOutButton.setVisible(false);
+		doneReceivingButton.setVisible(false);
 		printButton.setVisible(false);
 		newItemButton.setVisible(false);
+		undoButton.setVisible(false);
 		itemsTextArea.setVisible(false);
 		itemsScrollPane.setVisible(false);
 		setLayout(null);
@@ -194,16 +220,52 @@ public class InventoryApp extends JFrame implements MouseListener{
 			br.close();
 		}
 		catch(FileNotFoundException e){
-			System.out.println("File not found");
+			JOptionPane.showMessageDialog(program, "Could not fine the inventory file", "File not found", JOptionPane.WARNING_MESSAGE);
 		}
 		catch(IOException e) {
-			System.out.println("Problem with reading file");
+			JOptionPane.showMessageDialog(program, "Could not read the inventory file.", "Problem reading file", JOptionPane.WARNING_MESSAGE);
 		}
 		return(fileLines);
 	}
-	public static String[] findItem(ArrayList<String> inventoryList, String barcode) {
+	public void updateFile() {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(System.getenv("INVENTORY_LIST_2")));
+			for(int i = 0; i < inventoryLines.size(); i++) {
+				bw.write(inventoryLines.get(i));
+				if(i != inventoryLines.size() - 1) {
+					bw.newLine();
+				}
+			}
+			bw.close();
+		}
+		catch(IOException e){
+			JOptionPane.showMessageDialog(program, "Could not write to the inventory file.", "Problem writing to file", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+	public void createNewItem() {
+		JTextField barcode = new JTextField(10);
+		barcode.setFont(new Font("Arial", Font.BOLD, 28));
+		barcode.setLocation(100, 100);
+		JTextField name = new JTextField(10);
+		name.setFont(new Font("Arial", Font.BOLD, 28));
+		
+
+		JPanel newItemPanel = new JPanel();
+		newItemPanel.setLayout(new GridLayout(2,1));
+		newItemPanel.add(barcode);
+		newItemPanel.add(name);
+		
+		
+		int result = JOptionPane.showConfirmDialog(program, newItemPanel, 
+				"Please enter the item description:", JOptionPane.OK_CANCEL_OPTION);
+		if (result == JOptionPane.OK_OPTION) {
+			System.out.println("x value: " + barcode.getText());
+			System.out.println("y value: " + name.getText());
+		}
+	}
+	public String[] findItem(String barcode) {
 		/**
-		 * This method retrieves the info for the barcode barcode using the same schema as mentioned before
+		 * This method retrieves the info for the barcode using the same schema as mentioned before
 		 * 
 		 * @param inventoryList - a list of all the inventory items
 		 * @param barcode - the barcode of the barcode item
@@ -212,24 +274,101 @@ public class InventoryApp extends JFrame implements MouseListener{
 		String currentLine = "", matchedLine = "";
 		String[] matchedLineEntries = new String[4];
 		int lineNumber;
-		boolean lookingForMatch;
+		boolean lookingForMatch = true;
 		lineNumber = 0;
-		lookingForMatch = true;
 		
 		while(lookingForMatch){
-			currentLine = inventoryList.get(lineNumber);
+			currentLine = inventoryLines.get(lineNumber);
 			if(!barcode.equals("") && barcode.equals(currentLine.substring(0,currentLine.indexOf(",")))){
 				lookingForMatch = false;
 				matchedLine = currentLine;
 				matchedLineEntries = matchedLine.split("\\,");
 			}
 			else{
-				if(++lineNumber == inventoryList.size()){
+				if(++lineNumber == inventoryLines.size()){
 					lookingForMatch = false;
 				}
 			}
 		}
 		return(matchedLineEntries);
+	}
+	public void calculateInventory(String checkOutOrReceive) {
+		int selectedQuantity = 0;
+		String[] replacedLine;
+		String replacedLineString;
+		for(int i = 0; i < quantityList.size(); i++) {
+			selectedQuantity = quantityList.get(itemsOrder.get(i));
+			replacedLine = findItem(itemsOrder.get(i));
+			if(checkOutOrReceive.equals("checkOut")) {
+				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) - selectedQuantity) + "," + replacedLine[3];
+			}
+			else {
+				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) + selectedQuantity) + "," + replacedLine[3];
+			}
+			updateLine(replacedLineString, replacedLine[0].length());
+		}
+		updateFile();
+		updateRestockingNumber();
+		if(namesList.size() != 0) {
+			JOptionPane.showMessageDialog(program, "Successfully updated items!", "Update complete", JOptionPane.PLAIN_MESSAGE);
+		}
+			
+		itemsTextArea.setText("Quantity\tIn Stock\tItem\n");
+		itemsOrder.clear();
+		namesList.clear();
+		quantityList.clear();
+		itemsStack.clear();
+		undoButton.setVisible(false);
+	}
+	public void updateLine(String newLine, int barcodeLength) {
+		String currentLine = "";
+		int lineNumber;
+		boolean lookingForMatch = true;
+		lineNumber = 0;
+		
+		while(lookingForMatch){
+			currentLine = inventoryLines.get(lineNumber);
+			if(newLine.substring(0, barcodeLength).equals(currentLine.substring(0, barcodeLength))){
+				lookingForMatch = false;
+				inventoryLines.set(lineNumber, newLine);
+			}
+			else{
+				if(++lineNumber == inventoryLines.size()){
+					lookingForMatch = false;
+				}
+			}
+		}
+	}
+	public void updateRestockingNumber() {
+		restockingNumber = 0;
+		String currentItemLine = "";
+		String[] currentItemEntries = new String[4];
+ 		for(int i = 0; i < inventoryLines.size(); i++) {
+			currentItemLine = inventoryLines.get(i);
+			currentItemEntries = currentItemLine.split("\\,");
+			try {
+				if(currentItemEntries.length > 2 && currentItemEntries[2] != null && currentItemEntries[3] != null && Integer.parseInt(currentItemEntries[2]) < Integer.parseInt(currentItemEntries[3])) {
+					restockingNumber++;
+				}
+			}
+			catch(NumberFormatException e){
+				
+			}
+		}
+ 		if(restockingNumber != 0) {
+ 			restockingLabel.setText(restockingNumber + " item(s) needs restocking");
+ 			restockingLabel.setForeground(Color.RED);
+ 		}
+ 		else {
+ 			restockingLabel.setForeground(Color.BLACK);
+ 		}
+	}
+	public String updateItems() {
+		String itemsFormatted = "Quantity\tIn Stock\tItem\n";
+		for(int i = 0; i < itemsOrder.size(); i++) {
+			itemsFormatted += (quantityList.get(itemsOrder.get(i)) + "\t" + findItem(itemsOrder.get(i))[2] + "\t" + namesList.get(itemsOrder.get(i)) + "\n");
+		}
+		return itemsFormatted;
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -243,13 +382,16 @@ public class InventoryApp extends JFrame implements MouseListener{
 					itemsOrder.clear();
 					namesList.clear();
 					quantityList.clear();
+					itemsStack.clear();
 					checkOutButton.setVisible(true);
 					receiveInventoryButton.setVisible(true);
 					barcodeLabel.setVisible(false);
 					barcodeTextField.setVisible(false);
 					newItemButton.setVisible(false);
-					doneButton.setVisible(false);
+					doneCheckOutButton.setVisible(false);
+					doneReceivingButton.setVisible(false);
 					printButton.setVisible(false);
+					undoButton.setVisible(false);
 					itemsTextArea.setVisible(false);
 					itemsScrollPane.setVisible(false);
 				}
@@ -260,28 +402,57 @@ public class InventoryApp extends JFrame implements MouseListener{
 				barcodeLabel.setVisible(false);
 				barcodeTextField.setVisible(false);
 				newItemButton.setVisible(false);
-				doneButton.setVisible(false);
+				doneCheckOutButton.setVisible(false);
+				doneReceivingButton.setVisible(false);
 				printButton.setVisible(false);
 				itemsTextArea.setVisible(false);
 				itemsScrollPane.setVisible(false);
 			}
 		}
 		if(e.getSource() == reorderButton) {
-			checkOutButton.setVisible(false);
-			receiveInventoryButton.setVisible(false);
-			barcodeLabel.setVisible(false);
-			barcodeTextField.setVisible(false);
-			doneButton.setVisible(false);
-			printButton.setVisible(true);
-			itemsTextArea.setVisible(false);
-			itemsScrollPane.setVisible(false);
+			if(!namesList.isEmpty()) {
+				int choice = JOptionPane.showConfirmDialog(	program, 
+												"You are not finished entering in your items. All progress will be lost. Are you sure you want to exit?" ,
+												"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if(choice == 0) {
+					itemsTextArea.setText("Quantity\tIn Stock\tItem\n");
+					itemsOrder.clear();
+					namesList.clear();
+					quantityList.clear();
+					itemsStack.clear();
+					checkOutButton.setVisible(false);
+					receiveInventoryButton.setVisible(false);
+					barcodeLabel.setVisible(false);
+					barcodeTextField.setVisible(false);
+					newItemButton.setVisible(false);
+					doneCheckOutButton.setVisible(false);
+					doneReceivingButton.setVisible(false);
+					printButton.setVisible(true);
+					undoButton.setVisible(false);
+					itemsTextArea.setVisible(false);
+					itemsScrollPane.setVisible(false);
+				}
+			}
+			else {
+				checkOutButton.setVisible(false);
+				receiveInventoryButton.setVisible(false);
+				barcodeLabel.setVisible(false);
+				barcodeTextField.setVisible(false);
+				newItemButton.setVisible(false);
+				doneCheckOutButton.setVisible(false);
+				doneReceivingButton.setVisible(false);
+				printButton.setVisible(true);
+				itemsTextArea.setVisible(false);
+				itemsScrollPane.setVisible(false);
+			}
 		}
 		if(e.getSource() == checkOutButton) {
 			checkOutButton.setVisible(false);
 			receiveInventoryButton.setVisible(false);
 			barcodeLabel.setVisible(true);
 			barcodeTextField.setVisible(true);
-			doneButton.setVisible(true);
+			doneCheckOutButton.setVisible(true);
+			doneReceivingButton.setVisible(false);
 			itemsTextArea.setVisible(true);
 			itemsScrollPane.setVisible(true);
 			barcodeTextField.requestFocusInWindow();
@@ -291,28 +462,40 @@ public class InventoryApp extends JFrame implements MouseListener{
 			receiveInventoryButton.setVisible(false);
 			barcodeLabel.setVisible(true);
 			barcodeTextField.setVisible(true);
-			doneButton.setVisible(true);
+			doneCheckOutButton.setVisible(false);
+			doneReceivingButton.setVisible(true);
 			newItemButton.setVisible(true);
 			itemsTextArea.setVisible(true);
 			itemsScrollPane.setVisible(true);
 			barcodeTextField.requestFocusInWindow();
 		}
-		if(e.getSource() == doneButton) {			
-			// insert code to subtract/add items from inventory
-			
-			itemsTextArea.setText("Quantity\tIn Stock\tItem\n");
-			itemsOrder.clear();
-			namesList.clear();
-			quantityList.clear();
+		if(e.getSource() == doneCheckOutButton) {			
+			calculateInventory("checkOut");
+		}
+		if(e.getSource() == doneReceivingButton) {
+			calculateInventory("receive");
 		}
 		if(e.getSource() == printButton) {
 			
 		}
 		if(e.getSource() == newItemButton) {
-			
+			createNewItem();
+		}
+		if(e.getSource() == undoButton) {
+			String itemPopped = itemsStack.pop();
+			quantityList.replace(itemPopped, quantityList.get(itemPopped) - 1);
+			if(quantityList.get(itemPopped) < 1) {
+				quantityList.remove(itemPopped);
+				namesList.remove(itemPopped);
+				itemsOrder.remove(itemPopped);
+			}
+			itemsTextArea.setText(updateItems());
+			if(itemsStack.isEmpty()) {
+				undoButton.setVisible(false);
+			}
 		}
 	}
-	Action barcode = new AbstractAction()
+	Action barcodeScanned = new AbstractAction()
 	{
 	    @Override
 	    public void actionPerformed(ActionEvent e)
@@ -321,12 +504,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 			String[] barcodeItem;
 	        barcodeInput = barcodeTextField.getText().trim();
 	        barcodeTextField.setText("");
-	        barcodeItem = findItem(inventoryLines, barcodeInput);
+	        barcodeItem = findItem(barcodeInput);
 			if(barcodeItem[0] == null) {
 				JOptionPane.showMessageDialog(program, "Could not find the desired item. It is either not in the system or an invalid barcode.", "No match found", JOptionPane.WARNING_MESSAGE);
 			}
 			else {
 				namesList.put(barcodeItem[0], barcodeItem[1]);
+				itemsStack.push(barcodeItem[0]);
+				undoButton.setVisible(true);
 				if(quantityList.containsKey(barcodeItem[0])) {
 					quantityList.replace(barcodeItem[0], quantityList.get(barcodeItem[0]) + 1);
 				}
@@ -334,11 +519,23 @@ public class InventoryApp extends JFrame implements MouseListener{
 					quantityList.put(barcodeItem[0], 1);
 					itemsOrder.add(barcodeItem[0]);
 				}
-				String itemsFormatted = "Quantity\tIn Stock\tItem\n";
-				for(int i = 0; i < itemsOrder.size(); i++) {
-					itemsFormatted += (quantityList.get(itemsOrder.get(i)) + "\t1\t" + namesList.get(itemsOrder.get(i)) + "\n");
+				// this is assuming all the in-stock entries are numbers
+				if(doneCheckOutButton.isVisible()) {
+					if(quantityList.get(barcodeItem[0]) > Integer.parseInt(barcodeItem[2])) {
+						JOptionPane.showMessageDialog(program, "Could not check out this item because there is no more stock.", "Exceed stock quantity", JOptionPane.WARNING_MESSAGE);
+						quantityList.replace(barcodeItem[0], quantityList.get(barcodeItem[0]) - 1);
+						if(quantityList.get(barcodeItem[0]) < 1) {
+							quantityList.remove(barcodeItem[0]);
+							namesList.remove(barcodeItem[0]);
+							itemsOrder.remove(barcodeItem[0]);
+						}
+						itemsTextArea.setText(updateItems());
+						if(itemsStack.isEmpty()) {
+							undoButton.setVisible(false);
+						}
+					}
 				}
-				itemsTextArea.setText(itemsFormatted);
+				itemsTextArea.setText(updateItems());
 			}
 	    }
 	};
