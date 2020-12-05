@@ -582,13 +582,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 		}
  		if(restockingNumber != 0) {
- 			restockingLabel.setText(restockingNumber + " item(s) needs restocking");
  			restockingLabel.setForeground(Color.RED);
  		}
  		else {
- 			restockingLabel.setText(restockingNumber + " item(s) needs restocking");
  			restockingLabel.setForeground(Color.BLACK);
  		}
+ 		restockingLabel.setText(restockingNumber + " item(s) needs restocking");
 	}
 	public void updateRestockingItems() {
 		
