@@ -47,14 +47,12 @@ import java.awt.event.MouseListener;
 
 @SuppressWarnings("serial")
 public class InventoryApp extends JFrame implements MouseListener{
-	/**
-	 * All the variables used throughout the program are instantiated here
-	 */
+	
 	static InventoryApp program;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	
-	// stores the lines of the .csv file
+	// stores the lines of the Inventory.csv file
 	ArrayList<String> inventoryLines = new ArrayList<String>();
 	
 	// stores the order of how to display scanned items
@@ -93,10 +91,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 	int restockingNumber;
 	
 	InventoryApp(){
+		
 		/**
 		 * This initializes the program (reads inventory, creates GUI, etc)
 		 * 
 		 */
+		
 		inventoryLines = readFile("Inventory.csv");
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage("Logo.jpg"));
@@ -215,6 +215,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		program = new InventoryApp();
 	}
 	public static ArrayList<String> readFile(String inventoryFile) {
+		
 		/**
 		 * This method reads the inventory master list and stores it in an array.
 		 * 
@@ -226,6 +227,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		 * @param fileName - the name of the inventory file
 		 * @return fileLines - a list of all the inventory items
 		 */
+		
 		ArrayList<String> fileLines = new ArrayList<String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(inventoryFile));
@@ -244,6 +246,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 		return(fileLines);
 	}
 	public void updateInventoryFile() {
+		
+		/**
+		 * This method creates a new Inventory.csv file based on the current data
+		 * 
+		 */
+		
 		try {
 			File file = new File("Inventory.csv");
 			file.setWritable(true);
@@ -262,6 +270,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void createNewItem() {
+		
+		/**
+		 * This method is for adding new items into the Inventory.csv file
+		 * 
+		 */
+		
 		JTextField barcode = new JTextField(20);
 		barcode.setFont(new Font("Arial", Font.BOLD, 28));
 		JTextField name = new JTextField(20);
@@ -333,6 +347,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void editItem() {
+		
+		/**
+		 * This method is for editing the attributes of items found in the Inventory.csv file
+		 * 
+		 */
+		
 		String barcodeInput = "";
 		String[] barcodeItem = new String[4];
 		
@@ -416,13 +436,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public String[] findItem(String barcode) {
+		
 		/**
 		 * This method retrieves the info for the barcode using the same schema as mentioned before
 		 * 
-		 * @param inventoryList - a list of all the inventory items
 		 * @param barcode - the barcode of the barcode item
 		 * @return matchedLineEntries - a list of the entries of the matched item
 		 */
+		
 		String currentLine = "", matchedLine = "";
 		String[] matchedLineEntries = new String[4];
 		int lineNumber;
@@ -445,6 +466,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 		return(matchedLineEntries);
 	}
 	public void calculateInventory(String checkOutOrReceive) {
+		
+		/**
+		 * This method adds or subtracts inventory based on what the user is doing
+		 * 
+		 * @param checkOutOrReceive - this is a string that says either "add" or "subtract"
+		 */
+		
 		int selectedQuantity = 0;
 		String[] replacedLine;
 		String replacedLineString;
@@ -476,6 +504,15 @@ public class InventoryApp extends JFrame implements MouseListener{
 		undoButton.setVisible(false);
 	}
 	public void updateLog(String operator, int quantity, String item) {
+		
+		/**
+		 * This method creates a log file for troubleshooting bugs
+		 * 
+		 * @param operator - describes what action is taking place
+		 * @param quantity - how much of an item is changing
+		 * @param item - what item is being changed
+		 */
+		
 		try {
 			File file = new File("Log.txt");
  			file.setWritable(true);
@@ -497,6 +534,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void updateLine(String newLine, int barcodeLength) {
+		
+		/**
+		 * This method rewrites a line in the Inventory.csv file
+		 * 
+		 * @param newLine - the line that will replace the old line
+		 * @param barcodeLength - the barcode of the item that is meant to be changed
+		 */
+		
 		String currentLine = "";
 		int lineNumber;
 		boolean lookingForMatch = true;
@@ -516,6 +561,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void updateRestockingNumber() {
+		
+		/**
+		 * This method updates the restocking number at the top of the GUI
+		 */
+		
 		restockingNumber = 0;
 		String currentItemLine = "";
 		String[] currentItemEntries = new String[4];
@@ -536,10 +586,15 @@ public class InventoryApp extends JFrame implements MouseListener{
  			restockingLabel.setForeground(Color.RED);
  		}
  		else {
+ 			restockingLabel.setText(restockingNumber + " item(s) needs restocking");
  			restockingLabel.setForeground(Color.BLACK);
  		}
 	}
 	public void updateRestockingItems() {
+		
+		/**
+		 * This method updates the list of items that needs to be restocked
+		 */
 		
 		String itemsFormatted = "Restock Inventory List: " + dtf.format(LocalDateTime.now()) + "\n\nNeed\tItem\n";
 		String currentItemLine = "";
@@ -570,6 +625,13 @@ public class InventoryApp extends JFrame implements MouseListener{
  		itemsTextArea.setText(itemsFormatted);
 	}
 	public String updateItems() {
+		
+		/**
+		 * This method updates the items that appear on the screen
+		 * 
+		 * @return itemsFormatted - a string containing the list of items
+		 */
+		
 		String itemsFormatted = "Quantity\tIn Stock\tItem\n";
 		for(int i = 0; i < itemsOrder.size(); i++) {
 			itemsFormatted += (quantityList.get(itemsOrder.get(i)) + "\t" + findItem(itemsOrder.get(i))[2] + "\t" + namesList.get(itemsOrder.get(i)) + "\n");
@@ -578,6 +640,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		
+		/**
+		 * This method takes care of the different button press actions
+		 */
+		
 		if(e.getSource() == homeButton) {
 			if(!namesList.isEmpty()) {
 				int choice = JOptionPane.showConfirmDialog(	program, 
@@ -723,11 +790,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 			barcodeTextField.requestFocusInWindow();
 		}
 	}
-	Action barcodeScanned = new AbstractAction()
-	{
+	Action barcodeScanned = new AbstractAction(){
+		
+		/**
+		 * This method takes care of what happens when you scan a barcode
+		 */
+		
 	    @Override
-	    public void actionPerformed(ActionEvent e)
-	    {
+	    public void actionPerformed(ActionEvent e){
 	    	String barcodeInput = "";
 			String[] barcodeItem;
 	        barcodeInput = barcodeTextField.getText().trim();
