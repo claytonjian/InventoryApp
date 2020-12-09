@@ -283,16 +283,23 @@ public class InventoryApp extends JFrame implements MouseListener{
 		
 		try {
 			File file = new File("Inventory.csv");
+			File file2 = new File("C:\\Users\\Public\\Inventory.csv");
 			file.setWritable(true);
+			file2.setWritable(true);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			BufferedWriter bw2 = new BufferedWriter(new FileWriter(file2));
 			for(int i = 0; i < inventoryLines.size(); i++) {
 				bw.write(inventoryLines.get(i));
+				bw2.write(inventoryLines.get(i));
 				if(i != inventoryLines.size() - 1) {
 					bw.newLine();
+					bw2.newLine();
 				}
 			}
 			file.setWritable(false);
+			file2.setWritable(false);
 			bw.close();
+			bw2.close();
 		}
 		catch(IOException e){
 			JOptionPane.showMessageDialog(program, "Could not write to the inventory file.", "Problem writing to file", JOptionPane.WARNING_MESSAGE);
