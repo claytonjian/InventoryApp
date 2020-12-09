@@ -107,7 +107,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		
 		inventoryLines = readFile("Inventory.csv");
 		if(inventoryLines.size() == 0) {
-			inventoryLines = readFile("C:\\Users\\Public\\Inventory.csv");
+			inventoryLines = readFile("C:\\Users\\Public\\InventoryApp\\Inventory.csv");
 		}
 		setIconImage(Toolkit.getDefaultToolkit().getImage("Logo.jpg"));
 		
@@ -285,7 +285,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		
 		try {
 			File file = new File("Inventory.csv");
-			File file2 = new File("C:\\Users\\Public\\Inventory.csv");
+			File file2 = new File("C:\\Users\\Public\\InventoryApp\\Inventory.csv");
 			file.setWritable(true);
 			file2.setWritable(true);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
