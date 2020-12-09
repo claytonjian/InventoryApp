@@ -39,8 +39,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -348,18 +351,38 @@ public class InventoryApp extends JFrame implements MouseListener{
 		int result;
 		boolean validNewItem = false, cancel = false;
 		while(!validNewItem && !cancel) {
+			// makes it so the barcode text field is in focus
+			barcode.addAncestorListener(new AncestorListener() {     
+				@Override
+			    public void ancestorRemoved(AncestorEvent e) {
+					
+				}
+				@Override
+			    public void ancestorMoved(AncestorEvent e) {
+					
+				}            
+				@Override
+			    public void ancestorAdded(final AncestorEvent e) {
+			        SwingUtilities.invokeLater(new Runnable() {
+			            public void run() {
+			                e.getComponent().requestFocusInWindow();
+			            }
+			        });
+			    }
+			});
 			result = JOptionPane.showConfirmDialog(program, newItemPanel, 
 					"Please enter the item description:", JOptionPane.OK_CANCEL_OPTION);
 			if(result == JOptionPane.OK_OPTION && !barcode.getText().equals("") && !name.getText().equals("")) {
-				if(findItem(barcode.getText())[0] != null) {
+				if(findItem(barcode.getText().trim())[0] != null) {
 					JOptionPane.showMessageDialog(program, "The barcode you entered already exists for another item. Please enter another one.", "Duplicate barcode", JOptionPane.WARNING_MESSAGE);
+					barcode.setText("");
 				}
 				else {
-					String newInventoryLine = barcode.getText() + "," + name.getText() + "," + inStock.getValue() + "," + restock.getValue();
+					String newInventoryLine = barcode.getText().trim() + "," + name.getText().replaceAll(",", "-") + "," + inStock.getValue() + "," + restock.getValue();
 					inventoryLines.add(newInventoryLine);
 					updateInventoryFile();
 					updateRestockingNumber();
-					updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
+					//updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 					JOptionPane.showMessageDialog(program, "Successfully added item!", "Item creation complete", JOptionPane.PLAIN_MESSAGE);
 					barcodeTextField.requestFocusInWindow();
 					validNewItem = true;
@@ -386,6 +409,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		while(!validItem && !cancel) {
 			barcodeInput = JOptionPane.showInputDialog(program, "Please enter the barcode of the item:", "Edit Item", JOptionPane.INFORMATION_MESSAGE);
 			if(barcodeInput != null) {
+				barcodeInput = barcodeInput.trim();
 	        	barcodeItem = findItem(barcodeInput);
 			}
 			if(barcodeInput == null) {
@@ -437,6 +461,25 @@ public class InventoryApp extends JFrame implements MouseListener{
 				int result;
 				cancel = false;
 				while(!cancel) {
+					// makes the name text field in focus
+					name.addAncestorListener(new AncestorListener() {     
+						@Override
+					    public void ancestorRemoved(AncestorEvent e) {
+							
+						}
+						@Override
+					    public void ancestorMoved(AncestorEvent e) {
+							
+						}            
+						@Override
+					    public void ancestorAdded(final AncestorEvent e) {
+					        SwingUtilities.invokeLater(new Runnable() {
+					            public void run() {
+					                e.getComponent().requestFocusInWindow();
+					            }
+					        });
+					    }
+					});
 					result = JOptionPane.showConfirmDialog(program, editItemPanel, 
 							"Please enter the item description:", JOptionPane.OK_CANCEL_OPTION);
 					
@@ -449,11 +492,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 						}
 					}
 					else {
-						String editedItem = barcodeItem[0] + "," +  name.getText() + "," + inStock.getValue() + "," + restock.getValue();
+						String editedItem = barcodeItem[0] + "," +  name.getText().replaceAll(",", "-") + "," + inStock.getValue() + "," + restock.getValue();
 						updateLine(editedItem, barcodeItem[0].length());
 						updateInventoryFile();
 						updateRestockingNumber();
-						updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
+						//updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 						JOptionPane.showMessageDialog(program, "Successfully edited item!", "Item edit complete", JOptionPane.PLAIN_MESSAGE);
 						cancel = true;
 					}
@@ -507,11 +550,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 			replacedLine = findItem(itemsOrder.get(i));
 			if(checkOutOrReceive.equals("checkOut")) {
 				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) - selectedQuantity) + "," + replacedLine[3];
-				updateLog("sub", selectedQuantity, replacedLine[1]);
+				//updateLog("sub", selectedQuantity, replacedLine[1]);
 			}
 			else {
 				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) + selectedQuantity) + "," + replacedLine[3];
-				updateLog("add", selectedQuantity, replacedLine[1]);
+				//updateLog("add", selectedQuantity, replacedLine[1]);
 			}
 			updateLine(replacedLineString, replacedLine[0].length());
 		}
