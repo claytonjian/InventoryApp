@@ -106,7 +106,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 		 */
 		
 		inventoryLines = readFile("Inventory.csv");
-		
+		if(inventoryLines.size() == 0) {
+			inventoryLines = readFile("C:\\Users\\Public\\Inventory.csv");
+		}
 		setIconImage(Toolkit.getDefaultToolkit().getImage("Logo.jpg"));
 		
 	    setTitle("Inventory Management Program");
@@ -267,10 +269,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 			br.close();
 		}
 		catch(FileNotFoundException e){
-			JOptionPane.showMessageDialog(program, "Could not find the inventory file. Please include a \"Inventory.csv\" file in the Inventory App folder.", "File not found", JOptionPane.WARNING_MESSAGE);
+
 		}
 		catch(IOException e) {
-			JOptionPane.showMessageDialog(program, "Could not read the inventory file.", "Problem reading file", JOptionPane.WARNING_MESSAGE);
+
 		}
 		return(fileLines);
 	}
