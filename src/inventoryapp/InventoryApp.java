@@ -818,6 +818,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(e.getSource() == checkOutButton) {
 			titleLabel.setText("Check Out(-)");
 			itemsTextArea.setText("Quantity\tIn Stock\tItem\n");
+			scanQuantity.setValue(1);
 			checkOutButton.setVisible(false);
 			receiveButton.setVisible(false);
 			editItemButton.setVisible(false);
@@ -834,6 +835,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(e.getSource() == receiveButton) {
 			titleLabel.setText("Receive(+)");
 			itemsTextArea.setText("Quantity\tIn Stock\tItem\n");
+			scanQuantity.setValue(1);
 			checkOutButton.setVisible(false);
 			receiveButton.setVisible(false);
 			editItemButton.setVisible(false);
@@ -887,6 +889,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			if(itemsStack.isEmpty()) {
 				undoButton.setVisible(false);
 			}
+			scanQuantity.setValue(1);
 			barcodeTextField.requestFocusInWindow();
 		}
 	}
