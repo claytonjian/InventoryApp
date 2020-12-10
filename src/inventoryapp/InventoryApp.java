@@ -106,7 +106,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 		 */
 		
 		inventoryLines = readFile("Inventory.csv");
-		if(inventoryLines.size() == 0) {
+		File masterList = new File("C:\\Users\\Public\\InventoryApp\\Inventory.csv");
+		if(inventoryLines.size() == 0 && masterList.exists()) {
 			inventoryLines = readFile("C:\\Users\\Public\\InventoryApp\\Inventory.csv");
 		}
 		setIconImage(Toolkit.getDefaultToolkit().getImage("Logo.jpg"));
@@ -855,9 +856,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		if(e.getSource() == doneCheckOutButton) {			
 			calculateInventory("checkOut");
+			program.requestFocusInWindow();
+			homeButton.doClick();
 		}
 		if(e.getSource() == doneReceivingButton) {
 			calculateInventory("receive");
+			program.requestFocusInWindow();
+			homeButton.doClick();
 		}
 		if(e.getSource() == printButton) {
 			try {
