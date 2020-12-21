@@ -29,12 +29,14 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -88,15 +90,18 @@ public class InventoryApp extends JFrame implements MouseListener{
 	JTextArea itemsTextArea;
 	JButton homeButton, restockButton, checkOutButton, receiveButton, newItemButton, doneCheckOutButton, doneReceivingButton, printButton, undoButton, editItemButton;
 	JTextField barcodeTextField;
-	JScrollPane itemsScrollPane;
+	JScrollPane itemsScrollPane, usersScrollPane;
 	SpinnerModel scanQuantity;
 	JSpinner scanSpinner;
+	JList<String> usersList;
 	JComponent scanEditor;
-	JPanel newItemPanel, editItemPanel;
+	JPanel newItemPanel, editItemPanel, signInPanel;
 	
-	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm");
 	
 	int restockingNumber;
+	String user;
+
 	
 	InventoryApp(){
 		
@@ -245,6 +250,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			JOptionPane.showMessageDialog(program, "There is a problem loading the appearance of the program.", "Could not load Look & Feel", JOptionPane.WARNING_MESSAGE);
 	    }
 		program = new InventoryApp();
+		program.signIn();
 	}
 	public static ArrayList<String> readFile(String inventoryFile) {
 		
@@ -392,7 +398,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					inventoryLines.add(newInventoryLine);
 					updateInventoryFile();
 					updateRestockingNumber();
-					//updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
+					updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 					JOptionPane.showMessageDialog(program, "Successfully added item!", "Item creation complete", JOptionPane.PLAIN_MESSAGE);
 					barcodeTextField.requestFocusInWindow();
 					validNewItem = true;
@@ -506,13 +512,52 @@ public class InventoryApp extends JFrame implements MouseListener{
 						updateLine(editedItem, barcodeItem[0].length());
 						updateInventoryFile();
 						updateRestockingNumber();
-						//updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
+						updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 						JOptionPane.showMessageDialog(program, "Successfully edited item!", "Item edit complete", JOptionPane.PLAIN_MESSAGE);
 						cancel = true;
 					}
 				}
 			}
 		}
+	}
+	public void signIn() {
+		String[] users = {"Garrus","Liara", "Wrex"};
+		user = "";
+		usersList = new JList<String>(users);
+		usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		usersList.setLayoutOrientation(JList.VERTICAL);
+		usersList.setVisibleRowCount(-1);
+		usersList.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
+		usersList.setFont(new Font("Arial", Font.BOLD, 28));
+		
+		usersScrollPane = new JScrollPane(usersList);
+		
+		signInPanel = new JPanel();
+		signInPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		signInPanel.add(usersList);
+		signInPanel.add(usersScrollPane);
+		
+		int result;
+		boolean validUser = false, cancel = false;
+		while(!validUser && !cancel) {
+			result = JOptionPane.showConfirmDialog(program, signInPanel, 
+					"Please choose your name:", JOptionPane.OK_CANCEL_OPTION);
+			if(result == JOptionPane.OK_OPTION) {
+				user = usersList.getSelectedValue();
+				if(user != null) {
+					JOptionPane.showMessageDialog(program, "Successfully signed in!", "Sign in complete", JOptionPane.PLAIN_MESSAGE);
+					validUser = true;
+					System.out.println(user);
+				}
+				else {
+					JOptionPane.showMessageDialog(program, "No user was selected.", "Sign in failed", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+			else {
+				cancel = true;
+			}
+		}
+		
 	}
 	public String[] findItem(String barcode) {
 		
@@ -560,11 +605,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 			replacedLine = findItem(itemsOrder.get(i));
 			if(checkOutOrReceive.equals("checkOut")) {
 				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) - selectedQuantity) + "," + replacedLine[3];
-				//updateLog("sub", selectedQuantity, replacedLine[1]);
+				updateLog("sub", selectedQuantity, replacedLine[1]);
 			}
 			else {
 				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) + selectedQuantity) + "," + replacedLine[3];
-				//updateLog("add", selectedQuantity, replacedLine[1]);
+				updateLog("add", selectedQuantity, replacedLine[1]);
 			}
 			updateLine(replacedLineString, replacedLine[0].length());
 		}
@@ -668,7 +713,6 @@ public class InventoryApp extends JFrame implements MouseListener{
  			restockingLabel.setForeground(Color.BLACK);
  			restockingLabel.setText(restockingNumber + " item(s) needs restocking");
  		}
- 		
 	}
 	public void updateRestockingItems() {
 		
@@ -858,6 +902,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			calculateInventory("checkOut");
 			program.requestFocusInWindow();
 			homeButton.doClick();
+			signIn();
 		}
 		if(e.getSource() == doneReceivingButton) {
 			calculateInventory("receive");
