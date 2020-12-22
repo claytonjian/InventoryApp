@@ -12,6 +12,13 @@ package inventoryapp;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+/*
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+*/
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.BufferedReader;
@@ -58,6 +65,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 	static InventoryApp program;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	
+	// stores the users of the system
+	ArrayList<String> userLines = new ArrayList<String>();
 	
 	// stores the lines of the Inventory.csv file
 	ArrayList<String> inventoryLines = new ArrayList<String>();
@@ -250,9 +260,26 @@ public class InventoryApp extends JFrame implements MouseListener{
 			JOptionPane.showMessageDialog(program, "There is a problem loading the appearance of the program.", "Could not load Look & Feel", JOptionPane.WARNING_MESSAGE);
 	    }
 		program = new InventoryApp();
-		program.signIn();
+		//connectToDB();
 	}
-	public static ArrayList<String> readFile(String inventoryFile) {
+	/*
+	public static void connectToDB() {
+		Statement s;
+		ResultSet r = null;
+		try {
+	        Class.forName("java.sql.Driver"); // load driver
+	        Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;"); // try to connect with your attributes 
+	        s = conn.createStatement();
+	        String sqlStatement = "SELECT * from product";
+	        r = s.executeQuery(sqlStatement);
+	    } catch (ClassNotFoundException e) { // 
+	    	JOptionPane.showMessageDialog(program, "There is a problem loading the JDBC driver.", "Could not load driver", JOptionPane.WARNING_MESSAGE);	    
+	    } catch (SQLException e) {
+	    	JOptionPane.showMessageDialog(program, "There is a problem connecting to the database.", "Could not connect to DB", JOptionPane.WARNING_MESSAGE);
+	    }
+	}
+	*/
+	public static ArrayList<String> readFile(String file) {
 		
 		/**
 		 * This method reads the inventory master list and stores it in an array.
@@ -268,7 +295,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		
 		ArrayList<String> fileLines = new ArrayList<String>();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(inventoryFile));
+			BufferedReader br = new BufferedReader(new FileReader(file));
 			String fileLine;
 			while ((fileLine = br.readLine()) != null) {
 				fileLines.add(fileLine);
@@ -521,8 +548,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void signIn() {
-		String[] users = {"Garrus","Liara", "Wrex"};
 		user = "";
+		userLines = readFile("users.txt");
+		String[] users = new String[userLines.size()];
+		users =	userLines.toArray(users);
 		usersList = new JList<String>(users);
 		usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		usersList.setLayoutOrientation(JList.VERTICAL);
@@ -545,9 +574,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			if(result == JOptionPane.OK_OPTION) {
 				user = usersList.getSelectedValue();
 				if(user != null) {
-					JOptionPane.showMessageDialog(program, "Successfully signed in!", "Sign in complete", JOptionPane.PLAIN_MESSAGE);
 					validUser = true;
-					System.out.println(user);
 				}
 				else {
 					JOptionPane.showMessageDialog(program, "No user was selected.", "Sign in failed", JOptionPane.WARNING_MESSAGE);
@@ -642,13 +669,13 @@ public class InventoryApp extends JFrame implements MouseListener{
  			file.setWritable(true);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
 			if(operator.equals("add")) {
-				bw.write(dtf.format(LocalDateTime.now()) + "\tAdded " + quantity + " " + item + "\n");
+				bw.write(dtf.format(LocalDateTime.now()) + "\t" + user + " added " + quantity + " " + item + "\n");
 			}
 			else if(operator.equals("sub")) {
-				bw.write(dtf.format(LocalDateTime.now()) + "\tSubtracted " + quantity + " " + item + "\n");
+				bw.write(dtf.format(LocalDateTime.now()) + "\t" + user + " subtracted " + quantity + " " + item + "\n");
 			}
 			else {
-				bw.write(dtf.format(LocalDateTime.now()) + "\tIntroduced/Changed " + item + "\n");
+				bw.write(dtf.format(LocalDateTime.now()) + "\t" + user + " introduced/changed " + item + "\n");
 			}
 			file.setWritable(false);
 			bw.close();
@@ -898,16 +925,19 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(e.getSource() == editItemButton) {
 			editItem();
 		}
-		if(e.getSource() == doneCheckOutButton) {			
-			calculateInventory("checkOut");
-			program.requestFocusInWindow();
-			homeButton.doClick();
+		if(e.getSource() == doneCheckOutButton) {	
 			signIn();
+			if(!user.isEmpty()) {
+				calculateInventory("checkOut");
+			}
+			barcodeTextField.requestFocusInWindow();
 		}
 		if(e.getSource() == doneReceivingButton) {
-			calculateInventory("receive");
-			program.requestFocusInWindow();
-			homeButton.doClick();
+			signIn();
+			if(!user.isEmpty()) {
+				calculateInventory("receive");
+			}
+			barcodeTextField.requestFocusInWindow();
 		}
 		if(e.getSource() == printButton) {
 			try {
