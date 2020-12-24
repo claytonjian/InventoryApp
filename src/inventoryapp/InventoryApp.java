@@ -61,13 +61,15 @@ import java.awt.event.MouseListener;
 
 @SuppressWarnings("serial")
 public class InventoryApp extends JFrame implements MouseListener{
-	
 	static InventoryApp program;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	
 	// stores the users of the system
-	ArrayList<String> userLines = new ArrayList<String>();
+	ArrayList<String> usersLines = new ArrayList<String>();
+	
+	// stores the lines of the item log
+	ArrayList<String> itemLogLines = new ArrayList<String>();
 	
 	// stores the lines of the Inventory.csv file
 	ArrayList<String> inventoryLines = new ArrayList<String>();
@@ -93,24 +95,23 @@ public class InventoryApp extends JFrame implements MouseListener{
 	*	---------------
 	*/
 	HashMap<String, Integer> quantityList = new HashMap<String, Integer>();
-	
-	
+		
 	// GUI elements
 	JLabel titleLabel, restockingLabel, barcodeLabel, scanQuantityLabel;
 	JTextArea itemsTextArea;
-	JButton homeButton, restockButton, checkOutButton, receiveButton, newItemButton, doneCheckOutButton, doneReceivingButton, printButton, undoButton, editItemButton;
+	JButton homeButton, restockButton, usersButton, itemLogButton, checkOutButton, receiveButton, newItemButton, doneCheckOutButton, doneReceivingButton, printButton, undoButton, editItemButton;
 	JTextField barcodeTextField;
 	JScrollPane itemsScrollPane, usersScrollPane;
 	SpinnerModel scanQuantity;
 	JSpinner scanSpinner;
 	JList<String> usersList;
 	JComponent scanEditor;
-	JPanel newItemPanel, editItemPanel, signInPanel;
+	JPanel newItemPanel, editItemPanel, usersPanel;
 	
-	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm");
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM dd yyyy");
 	
 	int restockingNumber;
-	String user;
+	String user = "";
 
 	
 	InventoryApp(){
@@ -125,6 +126,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(inventoryLines.size() == 0 && masterList.exists()) {
 			inventoryLines = readFile("C:\\Users\\Public\\InventoryApp\\Inventory.csv");
 		}
+		File logFile = new File("Log.csv");
+		try {
+			logFile.createNewFile();
+		}
+		catch(IOException ioe) {
+			
+		}
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage("Logo.jpg"));
 		
 	    setTitle("Inventory Management Program");
@@ -137,7 +146,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	    
 	    homeButton = new JButton("Home");
-		homeButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.1), screenSize.width/5, screenSize.height/20);
+		homeButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.025), screenSize.width/5, screenSize.height/20);
 		homeButton.setFont(new Font("Arial", Font.BOLD, 36));
 		homeButton.addMouseListener(this);
 		
@@ -145,6 +154,16 @@ public class InventoryApp extends JFrame implements MouseListener{
 		restockButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.1), screenSize.width/5, screenSize.height/20);
 		restockButton.setFont(new Font("Arial", Font.BOLD, 36));
 		restockButton.addMouseListener(this);
+		
+		usersButton = new JButton("Users");
+		usersButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.1), screenSize.width/5, screenSize.height/20);
+		usersButton.setFont(new Font("Arial", Font.BOLD, 36));
+		usersButton.addMouseListener(this);
+		
+		itemLogButton = new JButton("Item Log");
+		itemLogButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.025), screenSize.width/5, screenSize.height/20);
+		itemLogButton.setFont(new Font("Arial", Font.BOLD, 36));
+		itemLogButton.addMouseListener(this);
 						
 		itemsTextArea = new JTextArea("Quantity\tIn Stock\tItem\n");
 	    itemsTextArea.setFont(new Font("Arial", Font.BOLD, 28));
@@ -212,15 +231,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 		scanQuantityLabel.setBounds((int)(screenSize.width * 0.25), (int)(screenSize.height * 0.75), screenSize.width/5, screenSize.height/20);
 		scanQuantityLabel.setFont(new Font("Arial", Font.BOLD, 28));
 		
-		scanQuantity = new SpinnerNumberModel(1, 0, 1000, 1);
+		scanQuantity = new SpinnerNumberModel(1, 1, 1000, 1);
 		scanSpinner = new JSpinner(scanQuantity);
 		scanSpinner.setBounds((int)(screenSize.width * 0.25), (int)(screenSize.height * 0.8), screenSize.width/10, screenSize.height/10);
 		scanSpinner.setFont(new Font("Arial", Font.BOLD, 48));
 		
 		// add elements to GUI
 		add(titleLabel);
-		add(restockButton);
 		add(homeButton);
+		add(usersButton);
+		add(restockButton);
+		add(itemLogButton);
 		add(checkOutButton);
 		add(receiveButton);
 		add(editItemButton);
@@ -259,7 +280,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    catch (Exception e) {
 			JOptionPane.showMessageDialog(program, "There is a problem loading the appearance of the program.", "Could not load Look & Feel", JOptionPane.WARNING_MESSAGE);
 	    }
+		UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 24));
+		UIManager.put("OptionPane.buttonFont", new Font("Arial", Font.BOLD, 24));
 		program = new InventoryApp();
+		program.setExtendedState(program.getExtendedState()|JFrame.MAXIMIZED_BOTH );
 		//connectToDB();
 	}
 	/*
@@ -282,7 +306,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	public static ArrayList<String> readFile(String file) {
 		
 		/**
-		 * This method reads the inventory master list and stores it in an array.
+		 * This method reads files.
 		 * 
 		 * The inventory list is a .csv file that is organized with the following schema:
 		 * --------------------------------------------------------------
@@ -303,7 +327,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			br.close();
 		}
 		catch(FileNotFoundException e){
-
+			JOptionPane.showMessageDialog(program, "There is a problem loading the " + file + " file.", "Could not load file", JOptionPane.WARNING_MESSAGE);
 		}
 		catch(IOException e) {
 
@@ -438,6 +462,89 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 		}
 	}
+	public void editUsers() {
+		user = "";
+		usersLines = readFile("Users.txt");
+		String[] users = new String[usersLines.size()];
+		users =	usersLines.toArray(users);
+		usersList = new JList<String>(users);
+		usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		usersList.setLayoutOrientation(JList.VERTICAL);
+		usersList.setVisibleRowCount(-1);
+		usersList.setFont(new Font("Arial", Font.BOLD, 28));
+		usersList.setSelectedIndex(0);
+		
+		usersScrollPane = new JScrollPane(usersList);
+		usersScrollPane.setViewportView(usersList);
+		usersScrollPane.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
+	    usersScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	    usersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		
+		usersPanel = new JPanel();
+		usersPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		usersScrollPane.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
+		usersPanel.add(usersScrollPane);
+		
+		String[] options = {"New User", "Delete User", "Cancel"};
+		int result;
+		result = JOptionPane.showOptionDialog(program, usersPanel, "Edit Users", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, null);
+		if(result == 0) {
+			user = JOptionPane.showInputDialog(program, "Please enter the user name:", "New User", JOptionPane.INFORMATION_MESSAGE);
+			if(user != null) {
+				try {
+		 			File file = new File("Users.txt");
+		 			File file2 = new File("C:\\Users\\Public\\InventoryApp\\Users.txt");
+		 			file.setWritable(true);
+		 			file2.setWritable(true);
+					BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+		 			BufferedWriter bw2 = new BufferedWriter(new FileWriter(file2, true));
+					bw.write(user + "\n");
+					bw2.write(user + "\n");
+					file.setWritable(false);
+					file2.setWritable(false);
+					bw.close();
+					bw2.close();
+					JOptionPane.showMessageDialog(program, "Successfully created user!", "User creation complete", JOptionPane.PLAIN_MESSAGE);
+				}
+				catch(IOException e){
+					JOptionPane.showMessageDialog(program, "Could not create a new user.", "Problem with creating user", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		}
+		if(result == 1) {
+			user = usersList.getSelectedValue();
+			if(user != null) {
+				int choice = JOptionPane.showConfirmDialog(	program, 
+						("Are you sure you want to delete " + user + "?"), "Delete User", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if(choice == 0) {
+					usersLines.remove(usersList.getSelectedIndex());
+					try {
+			 			File file = new File("Users.txt");
+			 			File file2 = new File("C:\\Users\\Public\\InventoryApp\\Users.txt");
+			 			file.setWritable(true);
+			 			file2.setWritable(true);
+						BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+						BufferedWriter bw2 = new BufferedWriter(new FileWriter(file));
+						for(int i = 0; i < usersLines.size(); i++) {
+							bw.write(usersLines.get(i) + "\n");
+							bw2.write(usersLines.get(i) + "\n");
+						}
+						file.setWritable(false);
+						file2.setWritable(false);
+						bw.close();
+						bw2.close();
+						JOptionPane.showMessageDialog(program, "Successfully deleted user!", "User deletion complete", JOptionPane.PLAIN_MESSAGE);
+					}
+					catch(IOException e){
+						JOptionPane.showMessageDialog(program, "Could not delete user.", "Problem with deleting user", JOptionPane.WARNING_MESSAGE);
+					}
+				}
+			}
+			else {
+				JOptionPane.showMessageDialog(program, "Could not delete user because there are no users.", "Problem with deleting user", JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
 	public void editItem() {
 		
 		/**
@@ -548,33 +655,43 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void signIn() {
+		
 		user = "";
-		userLines = readFile("users.txt");
-		String[] users = new String[userLines.size()];
-		users =	userLines.toArray(users);
+		usersLines = readFile("Users.txt");
+		String[] users = new String[usersLines.size()];
+		users =	usersLines.toArray(users);
 		usersList = new JList<String>(users);
 		usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		usersList.setLayoutOrientation(JList.VERTICAL);
 		usersList.setVisibleRowCount(-1);
 		usersList.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
 		usersList.setFont(new Font("Arial", Font.BOLD, 28));
-		
 		usersScrollPane = new JScrollPane(usersList);
+		usersScrollPane.setViewportView(usersList);
+		usersScrollPane.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
+	    usersScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	    usersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
-		signInPanel = new JPanel();
-		signInPanel.setFont(new Font("Arial", Font.BOLD, 28));
-		signInPanel.add(usersList);
-		signInPanel.add(usersScrollPane);
+		usersPanel = new JPanel();
+		usersPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		usersPanel.add(usersScrollPane);
 		
 		int result;
 		boolean validUser = false, cancel = false;
 		while(!validUser && !cancel) {
-			result = JOptionPane.showConfirmDialog(program, signInPanel, 
+			result = JOptionPane.showConfirmDialog(program, usersPanel, 
 					"Please choose your name:", JOptionPane.OK_CANCEL_OPTION);
 			if(result == JOptionPane.OK_OPTION) {
 				user = usersList.getSelectedValue();
 				if(user != null) {
 					validUser = true;
+					if(doneCheckOutButton.isVisible()) {
+						calculateInventory("checkOut");
+					}
+
+					if(doneReceivingButton.isVisible()) {
+						calculateInventory("receive");
+					}
 				}
 				else {
 					JOptionPane.showMessageDialog(program, "No user was selected.", "Sign in failed", JOptionPane.WARNING_MESSAGE);
@@ -657,26 +774,45 @@ public class InventoryApp extends JFrame implements MouseListener{
 	public void updateLog(String operator, int quantity, String item) {
 		
 		/**
-		 * This method creates a log file for troubleshooting bugs
+		 * This method creates a custom log file for check outs/address input
 		 * 
 		 * @param operator - describes what action is taking place
 		 * @param quantity - how much of an item is changing
 		 * @param item - what item is being changed
 		 */
-		
+		itemLogLines = readFile("Log.csv");
+		if(item.length() > 70) {
+			item = item.substring(0,70) + "...";
+		}
 		try {
-			File file = new File("Log.txt");
+			File file = new File("Log.csv");
  			file.setWritable(true);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
-			if(operator.equals("add")) {
+			if(!itemLogLines.contains("----- " + dtf.format(LocalDateTime.now()) + " -----")) {
+				if(itemLogLines.size() != 0) {
+					bw.write("\n\n");
+				}
+				bw.write("----- " + dtf.format(LocalDateTime.now()) + " -----\n\n");
+			}
+			if(operator.equals("sub")) {
+				for(int i = 0; i < quantity; i++) {
+					bw.write(user + ",," + item + "\n•       Address:______________________________________________________________________\n");
+				}
+			}
+			/*
+			 * 	For optional add statement
+			 * 
+			else if(operator.equals("add")) {
 				bw.write(dtf.format(LocalDateTime.now()) + "\t" + user + " added " + quantity + " " + item + "\n");
 			}
-			else if(operator.equals("sub")) {
-				bw.write(dtf.format(LocalDateTime.now()) + "\t" + user + " subtracted " + quantity + " " + item + "\n");
-			}
+			*/
+			/*
+			 * For optional edit statement
+			 * 
 			else {
 				bw.write(dtf.format(LocalDateTime.now()) + "\t" + user + " introduced/changed " + item + "\n");
 			}
+			*/
 			file.setWritable(false);
 			bw.close();
 		}
@@ -753,6 +889,9 @@ public class InventoryApp extends JFrame implements MouseListener{
  		for(int i = 0; i < inventoryLines.size(); i++) {
 			currentItemLine = inventoryLines.get(i);
 			currentItemEntries = currentItemLine.split("\\,");
+			if(currentItemEntries[1].length() > 70) {
+				currentItemEntries[1] = currentItemEntries[1].substring(0,70) + "...";
+			}
 			try {
 				if(currentItemEntries.length > 2 && currentItemEntries[2] != null && currentItemEntries[3] != null && Integer.parseInt(currentItemEntries[2]) < Integer.parseInt(currentItemEntries[3])) {
 					itemsFormatted += (Integer.parseInt(currentItemEntries[3]) - Integer.parseInt(currentItemEntries[2])) + "\t" + currentItemEntries[1] + "\n";
@@ -774,6 +913,27 @@ public class InventoryApp extends JFrame implements MouseListener{
 			JOptionPane.showMessageDialog(program, "Could not write to the restocking file.", "Problem writing to file", JOptionPane.WARNING_MESSAGE);
 		}
  		itemsTextArea.setText(itemsFormatted);
+	}
+	public void updateItemLog() {
+		/** 
+		 * This method updates the text area with the log file
+		 */
+		String itemsFormatted = "Item Log: " + "\n\n";
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("Log.csv"));
+			String fileLine;
+			while ((fileLine = br.readLine()) != null) {
+				itemsFormatted += ((fileLine) + "\n").replaceAll("\\,", "\t");
+			}
+			br.close();
+		}
+		catch(FileNotFoundException e){
+			JOptionPane.showMessageDialog(program, "There is a problem loading the item log file.", "Could not load item log", JOptionPane.WARNING_MESSAGE);
+		}
+		catch(IOException e) {
+
+		}
+		itemsTextArea.setText(itemsFormatted);
 	}
 	public String updateItems() {
 		
@@ -867,6 +1027,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					itemsTextArea.setVisible(true);
 					itemsScrollPane.setVisible(true);
 					updateRestockingItems();
+					itemsTextArea.setCaretPosition(0);
 				}
 			}
 			else {
@@ -885,7 +1046,61 @@ public class InventoryApp extends JFrame implements MouseListener{
 				itemsTextArea.setVisible(true);
 				itemsScrollPane.setVisible(true);
 				updateRestockingItems();
+				itemsTextArea.setCaretPosition(0);
+
 			}
+		}
+		if(e.getSource() == itemLogButton) {
+			if(!namesList.isEmpty()) {
+				int choice = JOptionPane.showConfirmDialog(	program, 
+												"You are not finished entering in your items. All progress will be lost. Are you sure you want to exit?" ,
+												"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if(choice == 0) {
+					itemsOrder.clear();
+					namesList.clear();
+					quantityList.clear();
+					itemsStack.clear();
+					titleLabel.setText("Item Log");
+					checkOutButton.setVisible(false);
+					receiveButton.setVisible(false);
+					editItemButton.setVisible(false);
+					barcodeLabel.setVisible(false);
+					scanQuantityLabel.setVisible(false);
+					barcodeTextField.setVisible(false);
+					scanSpinner.setVisible(false);
+					newItemButton.setVisible(false);
+					doneCheckOutButton.setVisible(false);
+					doneReceivingButton.setVisible(false);
+					printButton.setVisible(true);
+					undoButton.setVisible(false);
+					itemsTextArea.setVisible(true);
+					itemsScrollPane.setVisible(true);
+					updateItemLog();
+					itemsTextArea.setCaretPosition(0);
+				}
+			}
+			else {
+				titleLabel.setText("Item Log");
+				checkOutButton.setVisible(false);
+				receiveButton.setVisible(false);
+				editItemButton.setVisible(false);
+				barcodeLabel.setVisible(false);
+				scanQuantityLabel.setVisible(false);
+				barcodeTextField.setVisible(false);
+				scanSpinner.setVisible(false);
+				newItemButton.setVisible(false);
+				doneCheckOutButton.setVisible(false);
+				doneReceivingButton.setVisible(false);
+				printButton.setVisible(true);
+				itemsTextArea.setVisible(true);
+				itemsScrollPane.setVisible(true);
+				updateItemLog();
+				itemsTextArea.setCaretPosition(0);
+
+			}
+		}
+		if(e.getSource() == usersButton) {
+			editUsers();
 		}
 		if(e.getSource() == checkOutButton) {
 			titleLabel.setText("Check Out(-)");
@@ -925,17 +1140,15 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(e.getSource() == editItemButton) {
 			editItem();
 		}
-		if(e.getSource() == doneCheckOutButton) {	
-			signIn();
-			if(!user.isEmpty()) {
-				calculateInventory("checkOut");
+		if(e.getSource() == doneCheckOutButton) {
+			if(!namesList.isEmpty()) {
+				signIn();
 			}
 			barcodeTextField.requestFocusInWindow();
 		}
 		if(e.getSource() == doneReceivingButton) {
-			signIn();
-			if(!user.isEmpty()) {
-				calculateInventory("receive");
+			if(!namesList.isEmpty()) {
+				signIn();
 			}
 			barcodeTextField.requestFocusInWindow();
 		}
@@ -945,11 +1158,29 @@ public class InventoryApp extends JFrame implements MouseListener{
 				if(Desktop.isDesktopSupported()) {
 					desktop = Desktop.getDesktop();
 				}
-				desktop.print(new File("Restock.csv"));
-				JOptionPane.showMessageDialog(program, "Successfully printed restock list!", "Restock list printed", JOptionPane.PLAIN_MESSAGE);
+				if(titleLabel.getText().equals("Restock")) {
+					desktop.print(new File("Restock.csv"));
+					JOptionPane.showMessageDialog(program, "Successfully printed restock list!", "Restock list printed", JOptionPane.PLAIN_MESSAGE);
+				}
+				else if(titleLabel.getText().equals("Item Log")) {
+					File logFile = new File("Log.csv");
+					if(logFile.length() != 0) {
+						logFile.setWritable(true);
+						desktop.print(logFile);
+						JOptionPane.showMessageDialog(program, "Successfully printed item log!", "Item log printed", JOptionPane.PLAIN_MESSAGE);
+						BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
+						bw.write("");
+						logFile.setWritable(false);
+						bw.close();
+						itemsTextArea.setText("Item Log: " + "\n\n");
+					}
+					else {
+						JOptionPane.showMessageDialog(program, "There is nothing to print in the item log file.", "Could not print item log", JOptionPane.WARNING_MESSAGE);
+					}
+				}
 			}
 			catch(IOException ioe) {
-				JOptionPane.showMessageDialog(program, "Could not print the restock list.", "Problem with printing", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(program, "Could not print the specified document.", "Problem with printing", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 		if(e.getSource() == newItemButton) {
