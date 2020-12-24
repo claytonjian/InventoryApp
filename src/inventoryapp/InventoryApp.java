@@ -12,13 +12,13 @@ package inventoryapp;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-/*
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-*/
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.BufferedReader;
@@ -56,6 +56,10 @@ import javax.swing.event.AncestorListener;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -99,7 +103,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	// GUI elements
 	JLabel titleLabel, restockingLabel, barcodeLabel, scanQuantityLabel;
 	JTextArea itemsTextArea;
-	JButton homeButton, restockButton, usersButton, itemLogButton, checkOutButton, receiveButton, newItemButton, doneCheckOutButton, doneReceivingButton, printButton, undoButton, editItemButton;
+	JButton homeButton, restockButton, usersButton, itemLogButton, checkOutButton, receiveButton, newItemButton, doneButton, printButton, undoButton, editItemButton;
 	JTextField barcodeTextField;
 	JScrollPane itemsScrollPane, usersScrollPane;
 	SpinnerModel scanQuantity;
@@ -188,15 +192,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 		editItemButton.setFont(new Font("Arial", Font.BOLD, 36));
 		editItemButton.addMouseListener(this);
 		
-		doneCheckOutButton = new JButton("Done");
-		doneCheckOutButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		doneCheckOutButton.setFont(new Font("Arial", Font.BOLD, 36));
-		doneCheckOutButton.addMouseListener(this);
-		
-		doneReceivingButton = new JButton("Done");
-		doneReceivingButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		doneReceivingButton.setFont(new Font("Arial", Font.BOLD, 36));
-		doneReceivingButton.addMouseListener(this);
+		doneButton = new JButton("Done");
+		doneButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
+		doneButton.setFont(new Font("Arial", Font.BOLD, 36));
+		doneButton.addMouseListener(this);
 		
 		newItemButton = new JButton("New Item");
 		newItemButton.setBounds((int)(screenSize.width * 0.35), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
@@ -235,6 +234,46 @@ public class InventoryApp extends JFrame implements MouseListener{
 		scanSpinner = new JSpinner(scanQuantity);
 		scanSpinner.setBounds((int)(screenSize.width * 0.25), (int)(screenSize.height * 0.8), screenSize.width/10, screenSize.height/10);
 		scanSpinner.setFont(new Font("Arial", Font.BOLD, 48));
+		scanEditor = scanSpinner.getEditor();
+		if(scanEditor instanceof JSpinner.DefaultEditor) {
+			// for interactions with the scan quantity spinner
+			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)scanEditor;
+			spinnerEditor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+			spinnerEditor.getTextField().addFocusListener(new FocusListener() {
+				public void focusGained(FocusEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							spinnerEditor.getTextField().selectAll();
+						}
+					});
+				}
+				@Override
+				public void focusLost(FocusEvent e) {
+					
+				}
+			});
+			spinnerEditor.getTextField().addKeyListener(new KeyListener() {
+
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+						barcodeTextField.requestFocusInWindow();
+					}
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					
+				}
+
+				@Override
+				public void keyTyped(KeyEvent e) {
+					
+				}
+				
+			});
+		}
 		
 		// add elements to GUI
 		add(titleLabel);
@@ -250,8 +289,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		add(scanQuantityLabel);
 		add(scanSpinner);
 		add(barcodeTextField);
-		add(doneCheckOutButton);
-		add(doneReceivingButton);
+		add(doneButton);
 		add(printButton);
 		add(newItemButton);
 		add(undoButton);
@@ -262,8 +300,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		scanQuantityLabel.setVisible(false);
 		barcodeTextField.setVisible(false);
 		scanSpinner.setVisible(false);
-		doneCheckOutButton.setVisible(false);
-		doneReceivingButton.setVisible(false);
+		doneButton.setVisible(false);
 		printButton.setVisible(false);
 		newItemButton.setVisible(false);
 		undoButton.setVisible(false);
@@ -274,25 +311,26 @@ public class InventoryApp extends JFrame implements MouseListener{
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 	public static void main(String[] args) {
+		UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 24));
+		UIManager.put("OptionPane.buttonFont", new Font("Arial", Font.BOLD, 24));
 		try {
 	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    } 
 	    catch (Exception e) {
 			JOptionPane.showMessageDialog(program, "There is a problem loading the appearance of the program.", "Could not load Look & Feel", JOptionPane.WARNING_MESSAGE);
 	    }
-		UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 24));
-		UIManager.put("OptionPane.buttonFont", new Font("Arial", Font.BOLD, 24));
 		program = new InventoryApp();
 		program.setExtendedState(program.getExtendedState()|JFrame.MAXIMIZED_BOTH );
-		//connectToDB();
+		connectToDB();
 	}
-	/*
+	// there was no need to implement a database
 	public static void connectToDB() {
 		Statement s;
 		ResultSet r = null;
 		try {
 	        Class.forName("java.sql.Driver"); // load driver
 	        Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;"); // try to connect with your attributes 
+	        System.out.println("Success!");
 	        s = conn.createStatement();
 	        String sqlStatement = "SELECT * from product";
 	        r = s.executeQuery(sqlStatement);
@@ -302,7 +340,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    	JOptionPane.showMessageDialog(program, "There is a problem connecting to the database.", "Could not connect to DB", JOptionPane.WARNING_MESSAGE);
 	    }
 	}
-	*/
 	public static ArrayList<String> readFile(String file) {
 		
 		/**
@@ -385,6 +422,20 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(inStockEditor instanceof JSpinner.DefaultEditor) {
 			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)inStockEditor;
 			spinnerEditor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+			spinnerEditor.getTextField().addFocusListener(new FocusListener() {
+				public void focusGained(FocusEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							spinnerEditor.getTextField().selectAll();
+						}
+					});
+				}
+				@Override
+				public void focusLost(FocusEvent e) {
+					
+				}
+			});
 		}
 		
 		JSpinner restock = new JSpinner(restockQuantity);
@@ -393,6 +444,20 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(restockEditor instanceof JSpinner.DefaultEditor) {
 			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)restockEditor;
 			spinnerEditor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+			spinnerEditor.getTextField().addFocusListener(new FocusListener() {
+				public void focusGained(FocusEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							spinnerEditor.getTextField().selectAll();
+						}
+					});
+				}
+				@Override
+				public void focusLost(FocusEvent e) {
+					
+				}
+			});
 		}
 		
 		
@@ -439,7 +504,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			});
 			result = JOptionPane.showConfirmDialog(program, newItemPanel, 
 					"Please enter the item description:", JOptionPane.OK_CANCEL_OPTION);
-			if(result == JOptionPane.OK_OPTION && !barcode.getText().equals("") && !name.getText().equals("")) {
+			if(result == JOptionPane.OK_OPTION && !barcode.getText().isEmpty() && !name.getText().isEmpty()) {
 				if(findItem(barcode.getText().trim())[0] != null) {
 					JOptionPane.showMessageDialog(program, "The barcode you entered already exists for another item. Please enter another one.", "Duplicate barcode", JOptionPane.WARNING_MESSAGE);
 					barcode.setText("");
@@ -449,11 +514,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 					inventoryLines.add(newInventoryLine);
 					updateInventoryFile();
 					updateRestockingNumber();
-					updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
+					// updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 					JOptionPane.showMessageDialog(program, "Successfully added item!", "Item creation complete", JOptionPane.PLAIN_MESSAGE);
 					barcodeTextField.requestFocusInWindow();
 					validNewItem = true;
 				}
+			}
+			else if(result == JOptionPane.OK_OPTION && (barcode.getText().isEmpty() || name.getText().isEmpty())) {
+				JOptionPane.showMessageDialog(program, "All fields need to be filled in to create an item.", "Invalid fields", JOptionPane.WARNING_MESSAGE);
 			}
 			else {
 				if(result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
@@ -463,6 +531,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void editUsers() {
+		
+		/**
+		 * This method is used to manage the users of the system
+		 */
+		
 		user = "";
 		usersLines = readFile("Users.txt");
 		String[] users = new String[usersLines.size()];
@@ -489,8 +562,37 @@ public class InventoryApp extends JFrame implements MouseListener{
 		int result;
 		result = JOptionPane.showOptionDialog(program, usersPanel, "Edit Users", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, null);
 		if(result == 0) {
-			user = JOptionPane.showInputDialog(program, "Please enter the user name:", "New User", JOptionPane.INFORMATION_MESSAGE);
-			if(user != null) {
+			JPanel userInputPanel = new JPanel();
+			JLabel newUserLabel = new JLabel("Please enter the new user name:");
+			newUserLabel.setFont(new Font("Arial", Font.BOLD, 28));
+			JTextField userTextField = new JTextField();
+			userTextField.setFont(new Font("Arial", Font.BOLD, 28));
+			userInputPanel.setLayout(new GridLayout(2,1));
+			userInputPanel.add(newUserLabel);
+			userInputPanel.add(userTextField);
+			userTextField.addAncestorListener(new AncestorListener() {     
+				@Override
+			    public void ancestorRemoved(AncestorEvent e) {
+					
+				}
+				@Override
+			    public void ancestorMoved(AncestorEvent e) {
+					
+				}            
+				@Override
+			    public void ancestorAdded(final AncestorEvent e) {
+			        SwingUtilities.invokeLater(new Runnable() {
+			            public void run() {
+			                e.getComponent().requestFocusInWindow();
+			            }
+			        });
+			    }
+			});
+			int userResult;
+			userResult = JOptionPane.showConfirmDialog(program, userInputPanel, "Edit Item", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			
+			if(userResult == JOptionPane.OK_OPTION && !userTextField.getText().isEmpty()) {
+				user = userTextField.getText();
 				try {
 		 			File file = new File("Users.txt");
 		 			File file2 = new File("C:\\Users\\Public\\InventoryApp\\Users.txt");
@@ -509,6 +611,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 				catch(IOException e){
 					JOptionPane.showMessageDialog(program, "Could not create a new user.", "Problem with creating user", JOptionPane.WARNING_MESSAGE);
 				}
+			}
+			else if(userResult == JOptionPane.OK_OPTION && userTextField.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(program, "The user field cannot be blank.", "Problem with creating user", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 		if(result == 1) {
@@ -557,12 +662,39 @@ public class InventoryApp extends JFrame implements MouseListener{
 		
 		boolean validItem = false, cancel = false;
 		while(!validItem && !cancel) {
-			barcodeInput = JOptionPane.showInputDialog(program, "Please enter the barcode of the item:", "Edit Item", JOptionPane.INFORMATION_MESSAGE);
-			if(barcodeInput != null) {
-				barcodeInput = barcodeInput.trim();
+			JPanel barcodeInputPanel = new JPanel();
+			JLabel editItemLabel = new JLabel("Please enter the barcode of the item:");
+			editItemLabel.setFont(new Font("Arial", Font.BOLD, 28));
+			JTextField barcodeTextField = new JTextField();
+			barcodeTextField.setFont(new Font("Arial", Font.BOLD, 28));
+			barcodeInputPanel.setLayout(new GridLayout(2,1));
+			barcodeInputPanel.add(editItemLabel);
+			barcodeInputPanel.add(barcodeTextField);
+			barcodeTextField.addAncestorListener(new AncestorListener() {     
+				@Override
+			    public void ancestorRemoved(AncestorEvent e) {
+					
+				}
+				@Override
+			    public void ancestorMoved(AncestorEvent e) {
+					
+				}            
+				@Override
+			    public void ancestorAdded(final AncestorEvent e) {
+			        SwingUtilities.invokeLater(new Runnable() {
+			            public void run() {
+			                e.getComponent().requestFocusInWindow();
+			            }
+			        });
+			    }
+			});
+			int barcodeResult;
+			barcodeResult = JOptionPane.showConfirmDialog(program, barcodeInputPanel, "Edit Item", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			if(barcodeResult == JOptionPane.OK_OPTION && barcodeTextField.getText() != null) {
+				barcodeInput = barcodeTextField.getText().trim();
 	        	barcodeItem = findItem(barcodeInput);
 			}
-			if(barcodeInput == null) {
+			if(barcodeResult == JOptionPane.CANCEL_OPTION || barcodeResult == JOptionPane.CLOSED_OPTION) {
 				cancel = true;
 			}
 			else if(barcodeItem[0] == null) {
@@ -583,6 +715,20 @@ public class InventoryApp extends JFrame implements MouseListener{
 				if(inStockEditor instanceof JSpinner.DefaultEditor) {
 					JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)inStockEditor;
 					spinnerEditor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+					spinnerEditor.getTextField().addFocusListener(new FocusListener() {
+						public void focusGained(FocusEvent e) {
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									spinnerEditor.getTextField().selectAll();
+								}
+							});
+						}
+						@Override
+						public void focusLost(FocusEvent e) {
+							
+						}
+					});
 				}
 				
 				JSpinner restock = new JSpinner(restockQuantity);
@@ -591,6 +737,20 @@ public class InventoryApp extends JFrame implements MouseListener{
 				if(restockEditor instanceof JSpinner.DefaultEditor) {
 					JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)restockEditor;
 					spinnerEditor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+					spinnerEditor.getTextField().addFocusListener(new FocusListener() {
+						public void focusGained(FocusEvent e) {
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									spinnerEditor.getTextField().selectAll();
+								}
+							});
+						}
+						@Override
+						public void focusLost(FocusEvent e) {
+							
+						}
+					});
 				}
 				
 				editItemPanel = new JPanel();
@@ -646,7 +806,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 						updateLine(editedItem, barcodeItem[0].length());
 						updateInventoryFile();
 						updateRestockingNumber();
-						updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
+						// updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 						JOptionPane.showMessageDialog(program, "Successfully edited item!", "Item edit complete", JOptionPane.PLAIN_MESSAGE);
 						cancel = true;
 					}
@@ -655,6 +815,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 	}
 	public void signIn() {
+		
+		/**
+		 * This method is used to finalize the transaction and take the user's name
+		 */
 		
 		user = "";
 		usersLines = readFile("Users.txt");
@@ -685,11 +849,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 				user = usersList.getSelectedValue();
 				if(user != null) {
 					validUser = true;
-					if(doneCheckOutButton.isVisible()) {
+					if(titleLabel.getText().equals("Check Out(-)")) {
 						calculateInventory("checkOut");
 					}
 
-					if(doneReceivingButton.isVisible()) {
+					if(titleLabel.getText().equals("Receive(+)")) {
 						calculateInventory("receive");
 					}
 				}
@@ -720,7 +884,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		
 		while(inventoryLines.size() != 0 && lookingForMatch){
 			currentLine = inventoryLines.get(lineNumber);
-			if(!barcode.equals("") && barcode.length() <= currentLine.length() && barcode.equals(currentLine.substring(0,currentLine.indexOf(",")))){
+			if(!barcode.isEmpty() && barcode.length() <= currentLine.length() && barcode.equals(currentLine.substring(0,currentLine.indexOf(",")))){
 				lookingForMatch = false;
 				matchedLine = currentLine;
 				matchedLineEntries = matchedLine.split("\\,");
@@ -753,7 +917,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			else {
 				replacedLineString = replacedLine[0] + "," + replacedLine[1] + "," + (Integer.parseInt(replacedLine[2]) + selectedQuantity) + "," + replacedLine[3];
-				updateLog("add", selectedQuantity, replacedLine[1]);
+				// updateLog("add", selectedQuantity, replacedLine[1]);
 			}
 			updateLine(replacedLineString, replacedLine[0].length());
 		}
@@ -796,7 +960,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			if(operator.equals("sub")) {
 				for(int i = 0; i < quantity; i++) {
-					bw.write(user + ",," + item + "\n•       Address:______________________________________________________________________\n");
+					bw.write(user + ",," + item + "\n\n    Address:__________________________________________________________________\n\n");
 				}
 			}
 			/*
@@ -883,7 +1047,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		 * This method updates the list of items that needs to be restocked
 		 */
 		
-		String itemsFormatted = "Restock Inventory List: " + dtf.format(LocalDateTime.now()) + "\n\nNeed\tItem\n";
+		String itemsFormatted = "Restock Inventory List: " + dtf.format(LocalDateTime.now()) + "\n\nIn Stock\tItem\n";
 		String currentItemLine = "";
 		String[] currentItemEntries = new String[4];
  		for(int i = 0; i < inventoryLines.size(); i++) {
@@ -894,7 +1058,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			try {
 				if(currentItemEntries.length > 2 && currentItemEntries[2] != null && currentItemEntries[3] != null && Integer.parseInt(currentItemEntries[2]) < Integer.parseInt(currentItemEntries[3])) {
-					itemsFormatted += (Integer.parseInt(currentItemEntries[3]) - Integer.parseInt(currentItemEntries[2])) + "\t" + currentItemEntries[1] + "\n";
+					itemsFormatted += (Integer.parseInt(currentItemEntries[2])) + "\t" + currentItemEntries[1] + "\n";
 				}
 			}
 			catch(NumberFormatException e){
@@ -975,8 +1139,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					barcodeTextField.setVisible(false);
 					scanSpinner.setVisible(false);
 					newItemButton.setVisible(false);
-					doneCheckOutButton.setVisible(false);
-					doneReceivingButton.setVisible(false);
+					doneButton.setVisible(false);
 					printButton.setVisible(false);
 					undoButton.setVisible(false);
 					itemsTextArea.setVisible(false);
@@ -994,8 +1157,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				barcodeTextField.setVisible(false);
 				scanSpinner.setVisible(false);
 				newItemButton.setVisible(false);
-				doneCheckOutButton.setVisible(false);
-				doneReceivingButton.setVisible(false);
+				doneButton.setVisible(false);
 				printButton.setVisible(false);
 				itemsTextArea.setVisible(false);
 				itemsScrollPane.setVisible(false);
@@ -1020,8 +1182,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					barcodeTextField.setVisible(false);
 					scanSpinner.setVisible(false);
 					newItemButton.setVisible(false);
-					doneCheckOutButton.setVisible(false);
-					doneReceivingButton.setVisible(false);
+					doneButton.setVisible(false);
 					printButton.setVisible(true);
 					undoButton.setVisible(false);
 					itemsTextArea.setVisible(true);
@@ -1040,8 +1201,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				barcodeTextField.setVisible(false);
 				scanSpinner.setVisible(false);
 				newItemButton.setVisible(false);
-				doneCheckOutButton.setVisible(false);
-				doneReceivingButton.setVisible(false);
+				doneButton.setVisible(false);
 				printButton.setVisible(true);
 				itemsTextArea.setVisible(true);
 				itemsScrollPane.setVisible(true);
@@ -1069,8 +1229,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					barcodeTextField.setVisible(false);
 					scanSpinner.setVisible(false);
 					newItemButton.setVisible(false);
-					doneCheckOutButton.setVisible(false);
-					doneReceivingButton.setVisible(false);
+					doneButton.setVisible(false);
 					printButton.setVisible(true);
 					undoButton.setVisible(false);
 					itemsTextArea.setVisible(true);
@@ -1089,8 +1248,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				barcodeTextField.setVisible(false);
 				scanSpinner.setVisible(false);
 				newItemButton.setVisible(false);
-				doneCheckOutButton.setVisible(false);
-				doneReceivingButton.setVisible(false);
+				doneButton.setVisible(false);
 				printButton.setVisible(true);
 				itemsTextArea.setVisible(true);
 				itemsScrollPane.setVisible(true);
@@ -1113,8 +1271,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			scanQuantityLabel.setVisible(true);
 			barcodeTextField.setVisible(true);
 			scanSpinner.setVisible(true);
-			doneCheckOutButton.setVisible(true);
-			doneReceivingButton.setVisible(false);
+			doneButton.setVisible(true);
 			itemsTextArea.setVisible(true);
 			itemsScrollPane.setVisible(true);
 			barcodeTextField.requestFocusInWindow();
@@ -1130,8 +1287,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			scanQuantityLabel.setVisible(true);
 			barcodeTextField.setVisible(true);
 			scanSpinner.setVisible(true);
-			doneCheckOutButton.setVisible(false);
-			doneReceivingButton.setVisible(true);
+			doneButton.setVisible(true);
 			newItemButton.setVisible(true);
 			itemsTextArea.setVisible(true);
 			itemsScrollPane.setVisible(true);
@@ -1140,15 +1296,26 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(e.getSource() == editItemButton) {
 			editItem();
 		}
-		if(e.getSource() == doneCheckOutButton) {
-			if(!namesList.isEmpty()) {
-				signIn();
+		if(e.getSource() == doneButton) {
+			// this also takes care of interactions with the done button for it to function like "Enter"
+			if(!barcodeTextField.getText().isEmpty()) {
+				barcodeTextField.requestFocusInWindow();
+				try {
+					Robot r = new Robot();
+					r.keyPress(KeyEvent.VK_ENTER);
+					r.keyRelease(KeyEvent.VK_ENTER);
+				}
+				catch(AWTException awte) {
+					
+				}
 			}
-			barcodeTextField.requestFocusInWindow();
-		}
-		if(e.getSource() == doneReceivingButton) {
-			if(!namesList.isEmpty()) {
-				signIn();
+			else if((Integer)scanSpinner.getValue() != 1) {
+				barcodeTextField.requestFocusInWindow();
+			}
+			else {
+				if(!namesList.isEmpty()) {
+					signIn();
+				}
 			}
 			barcodeTextField.requestFocusInWindow();
 		}
@@ -1203,6 +1370,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 			scanQuantity.setValue(1);
 			barcodeTextField.requestFocusInWindow();
 		}
+		if(e.getSource() == scanSpinner) {
+			System.out.println("Hello!");
+		}
 	}
 	Action barcodeScanned = new AbstractAction(){
 		
@@ -1233,7 +1403,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					itemsOrder.add(barcodeItem[0]);
 				}
 				// this is assuming all the in-stock entries are numbers
-				if(doneCheckOutButton.isVisible()) {
+				if(doneButton.isVisible()) {
 					if(quantityList.get(barcodeItem[0]) > Integer.parseInt(barcodeItem[2])) {
 						JOptionPane.showMessageDialog(program, "Could not check out this item because there is no more stock.", "Exceed stock quantity", JOptionPane.WARNING_MESSAGE);
 						quantityList.replace(barcodeItem[0], quantityList.get(barcodeItem[0]) - (int)scanQuantity.getValue());
