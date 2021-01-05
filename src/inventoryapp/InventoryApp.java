@@ -128,6 +128,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM dd yyyy");
 	DateTimeFormatter dtfSQL = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	
+	String usernameDB, passwordDB;
 	int restockingNumber;
 	String user = "";
 	String sortByName = "";
@@ -362,20 +363,20 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    }
 		program = new InventoryApp();
 		program.setExtendedState(program.getExtendedState()|JFrame.MAXIMIZED_BOTH );
+		program.usernameDB = System.getenv("INVENTORYAPP_USER");
+		program.passwordDB = System.getenv("INVENTORYAPP_PASSWORD");
 		program.connectToDB();
 		program.updateRestockingNumber();
 	}
-
 	public void connectToDB() {
 		loadingPanel.setVisible(true);
 		connectingToDBProgressBar.setVisible(true);
 		try {
 	        Class.forName("java.sql.Driver"); // load driver
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;"); // try to connect with your attributes 
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";"); // try to connect with your attributes 
 	    } catch (ClassNotFoundException e) { // 
 	    	JOptionPane.showMessageDialog(program, "There is a problem loading the JDBC driver.", "Could not load driver", JOptionPane.WARNING_MESSAGE);	    
 	    } catch (SQLException e) {
-	    	e.printStackTrace();
 	    	JOptionPane.showMessageDialog(program, "There is a problem connecting to the database.", "Could not connect to DB", JOptionPane.WARNING_MESSAGE);
 	    }
 		finally {
@@ -495,7 +496,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				else {
 					try {
-				        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 						s = conn.createStatement();
 				        String sqlStatement = "INSERT INTO product VALUES ('" + barcode.getText().trim() + "','" + name.getText() + "'," + inStock.getValue() + "," + restock.getValue() + ");";
 				        s.execute(sqlStatement);
@@ -534,7 +535,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		user = "";
 		usersLines.clear();
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT e_fname, e_lname FROM employee ORDER BY e_fname;";
 	        r = s.executeQuery(sqlStatement);
@@ -613,17 +614,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 			userResult = JOptionPane.showConfirmDialog(program, userInputPanel, "Edit Item", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 			
 			
-			if(userResult == JOptionPane.OK_OPTION && (userFNameTextField.getText().isEmpty() || userLNameTextField.getText().isEmpty())) {
+			if(userResult == JOptionPane.OK_OPTION && (userFNameTextField.getText().trim().isEmpty() || userLNameTextField.getText().trim().isEmpty())) {
 				JOptionPane.showMessageDialog(program, "The user fields cannot be blank.", "Problem with creating user", JOptionPane.WARNING_MESSAGE);
 			}
 			else if(userResult == JOptionPane.OK_OPTION && (userFNameTextField.getText().trim().contains(" ") || userLNameTextField.getText().trim().contains(" "))) {
 				JOptionPane.showMessageDialog(program, "The user fields cannot contain spaces.", "Problem with creating user", JOptionPane.WARNING_MESSAGE);
 			}
-			else if(userResult == JOptionPane.OK_OPTION && !userFNameTextField.getText().isEmpty() && !userLNameTextField.getText().isEmpty()) {
+			else if(userResult == JOptionPane.OK_OPTION && !userFNameTextField.getText().trim().isEmpty() && !userLNameTextField.getText().trim().isEmpty()) {
 				String userFName = userFNameTextField.getText().trim();
 				String userLName = userLNameTextField.getText().trim();
 				try {
-			        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 					s = conn.createStatement();
 			        String sqlStatement = "INSERT INTO employee VALUES ('" + userLName + "', '" + userFName + "');";
 			        s.execute(sqlStatement);
@@ -649,7 +650,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 						("Are you sure you want to delete " + user + "?"), "Delete User", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if(choice == 0) {
 					try {
-				        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 						s = conn.createStatement();
 					    String sqlStatement = "DELETE FROM employee WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
 					    s.execute(sqlStatement);
@@ -811,7 +812,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			dayComboBox.addItem(i + 1);
 		}
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 			s = conn.createStatement();
 		    String sqlStatement = "SELECT MIN(YEAR(co_date)) FROM checkout;";
 		    r = s.executeQuery(sqlStatement);
@@ -969,7 +970,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 							"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if(choice == 0) {
 						try {	
-					        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+					        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 							s = conn.createStatement();
 						    String sqlStatement = "DELETE FROM product WHERE p_id = '" + barcodeItem[0] + "';";
 					        s.execute(sqlStatement);
@@ -990,7 +991,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				else {
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 						s = conn.createStatement();
 				        String sqlStatement = "UPDATE product SET p_name= '" + name.getText() + "', instock= " + inStock.getValue() + ", restock= " + restock.getValue() + " WHERE p_id = '" + barcodeItem[0] + "';";
 				        s.execute(sqlStatement);
@@ -1042,7 +1043,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		addressResult = JOptionPane.showConfirmDialog(program, addressInputPanel, "Edit Address", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		if(addressResult == JOptionPane.OK_OPTION && addressTextField.getText() != null) {
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 				s = conn.createStatement();
 		        String sqlStatement = "UPDATE checkout SET address= '" + addressTextField.getText() + "' WHERE co_id = " + itemLogNumber + ";";
 		        s.execute(sqlStatement);
@@ -1066,7 +1067,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		user = "";
 		usersLines.clear();
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT e_fname, e_lname FROM employee ORDER BY e_fname;";
 	        r = s.executeQuery(sqlStatement);
@@ -1181,7 +1182,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			fields =  new String[] {"Date", "User", "Product", "Address", "Log Number"};
 			values = null;
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 				s = conn.createStatement();
 				// get table size
 		        String sqlStatement = "SELECT COUNT(co_id) FROM checkout WHERE address IS NULL;";
@@ -1214,7 +1215,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			fields =  new String[] {"Date", "User", "Product", "Address", "Log Number"};
 			values = null;
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 				s = conn.createStatement();
 				// get table size
 		        String sqlStatement = "SELECT COUNT(co_id) FROM checkout;";
@@ -1268,7 +1269,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			values = null;
 			if(!user.equals("")) {
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 					s = conn.createStatement();
 					// get table size
 			        String sqlStatement = "SELECT COUNT(co_id) FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
@@ -1303,7 +1304,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			values = null;
 			if(barcodeItem[0] != null) {
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 					s = conn.createStatement();
 					// get table size
 			        String sqlStatement = "SELECT COUNT(co_id) FROM checkout WHERE p_id = '" + barcodeItem[0] + "';";
@@ -1336,7 +1337,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			fields =  new String[] {"Address", "Date", "User", "Product", "Log Number"};
 			values = null;
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 				s = conn.createStatement();
 				// get table size
 		        String sqlStatement = "SELECT COUNT(co_id) FROM checkout;";
@@ -1392,7 +1393,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		String[] matchedLineEntries = new String[4];
 		
 		try {
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT * FROM product WHERE p_id = '" + barcode + "';";
 	        r = s.executeQuery(sqlStatement);
@@ -1429,7 +1430,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			replacedLine = findItem(itemsOrder.get(i));
 			if(checkOutOrReceive.equals("checkOut")) {
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 					s = conn.createStatement();
 			        String sqlStatement = "UPDATE product SET instock= " + (Integer.parseInt(replacedLine[2]) - selectedQuantity) + " WHERE p_id = '" + replacedLine[0] + "';";
 			        s.execute(sqlStatement);
@@ -1447,7 +1448,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			else {
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 					s = conn.createStatement();
 			        String sqlStatement = "UPDATE product SET instock= " + (Integer.parseInt(replacedLine[2]) + selectedQuantity) + " WHERE p_id = '" + replacedLine[0] + "';";
 			        s.execute(sqlStatement);
@@ -1486,7 +1487,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			userParts = user.split("\\s+");
 			try {	
 				for(int i = 0; i < quantity; i++) {
-			        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 					s = conn.createStatement();
 			        String sqlStatement = "INSERT INTO checkout (co_date, e_id, p_id, address) SELECT '" + dtfSQL.format(LocalDateTime.now()) + "', e_id, '" + itemBarcode + "', NULL FROM employee WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
 			        s.execute(sqlStatement);
@@ -1521,7 +1522,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		restockingNumber = 0;
  		
  		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT COUNT(p_id) FROM product WHERE instock < restock;";
 	        r = s.executeQuery(sqlStatement);
@@ -1556,7 +1557,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		String itemsFormatted = "Restock Inventory List: " + dtf.format(LocalDateTime.now()) + "\n\nIn Stock\tItem\n";
 		String currentItemName = "";
  		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://localhost;database=Inventory;integratedSecurity=true;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" + usernameDB + ";password=" +passwordDB + ";");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT instock, p_name FROM product WHERE instock < restock ORDER BY p_name;";
 	        r = s.executeQuery(sqlStatement);
