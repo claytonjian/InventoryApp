@@ -2314,6 +2314,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 									}
 									catch(SQLException e) {
 								    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.", "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
+								    	e.printStackTrace();
 									}
 									finally {
 										try { s.close(); } catch (Exception e) {  }
@@ -2333,19 +2334,19 @@ public class InventoryApp extends JFrame implements MouseListener{
 							String sqlStatement;
 							if(checkOutRB.isSelected()) {
 								if(!statusCheckBox.isSelected()) {
-					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = " + p_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 0, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 0, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 					        		
 								}
 								else {
-					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = " + p_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 1, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 1, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 								}
 							}
 							else {
 								if(!statusCheckBox.isSelected()) {
-					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = " + p_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 0, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 0, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 								}
 								else {
-					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = " + p_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 1, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 1, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 								}
 							}
 					        s.execute(sqlStatement);
@@ -2354,6 +2355,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 						}
 						catch(SQLException e) {
 					    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.", "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
+					    	e.printStackTrace();
 						}
 						finally {
 							try { s.close(); } catch (Exception e) {  }
@@ -2371,6 +2373,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 							}
 							catch(SQLException e) {
 						    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.", "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
+						    	e.printStackTrace();
 							}
 							finally {
 								try { s.close(); } catch (Exception e) {  }
@@ -3259,6 +3262,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 					catch(SQLException e) {
 				    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
+				    	e.printStackTrace();
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3289,6 +3293,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 					catch(SQLException e) {
 				    	JOptionPane.showMessageDialog(program, "There is a problem finding defective item logs for reports.", "Could not find defective item logs in DB", JOptionPane.WARNING_MESSAGE);
+				    	e.printStackTrace();
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3322,6 +3327,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 					catch(SQLException e) {
 				    	JOptionPane.showMessageDialog(program, "There is a problem finding receive item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
+				    	e.printStackTrace();
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3352,6 +3358,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 					catch(SQLException e) {
 				    	JOptionPane.showMessageDialog(program, "There is a problem finding returned item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
+				    	e.printStackTrace();
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3383,6 +3390,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				catch(SQLException e) {
 			    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
+			    	e.printStackTrace();
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3415,6 +3423,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				catch(SQLException e) {
 			    	JOptionPane.showMessageDialog(program, "There is a problem finding defective item logs for reports.", "Could not find defective item logs in DB", JOptionPane.WARNING_MESSAGE);
+			    	e.printStackTrace();
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3448,6 +3457,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				catch(SQLException e) {
 			    	JOptionPane.showMessageDialog(program, "There is a problem finding receive item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
+			    	e.printStackTrace();
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3478,6 +3488,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				catch(SQLException e) {
 			    	JOptionPane.showMessageDialog(program, "There is a problem finding returned item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
+			    	e.printStackTrace();
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3514,6 +3525,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				catch(SQLException e) {
 			    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
+			    	e.printStackTrace();
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
