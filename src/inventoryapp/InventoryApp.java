@@ -123,7 +123,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	// GUI elements
 	JLabel titleLabel, connectingToDBLabel, restockingLabel, barcodeLabel, itemSearchLabel, scanQuantityLabel;
 	JTextArea itemsTextArea;
-	JButton homeButton, restockButton, usersButton, reportsButton, itemLogButton, checkOutButton, receiveButton, newItemButton, editItemLogButton, deleteItemLogButton, doneButton, printButton, undoButton, editItemButton, viewKitsButton, viewItemsButton, dateReportButton, userReportButton, productReportButton;
+	JButton homeButton, restockButton, usersButton, reportsButton, itemLogButton, checkOutButton, receiveButton, newItemButton, editItemLogButton, deleteItemLogButton, doneButton, printButton, undoButton, editItemButton, viewKitsButton, viewItemsButton, usageReportButton, snapshotReportButton, productReportButton;
 	JRadioButton yearRB, monthRB, dayRB, checkOutRB, receiveRB;
 	ButtonGroup checkOutOrReceiveBG;
 	JComboBox<Integer> yearComboBox, dayComboBox;
@@ -163,7 +163,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	int itemLog;
 	int year, month, day;
 	String dateOption;
-	String[] sortBy = {"Not Installed", "Date", "User", "Product"};
+	String[] sortBy = {"Past 4 Weeks", "Date", "User", "Product"};
 	
 	String barcodeInput = "";
 	String[] barcodeItem = new String[5];
@@ -206,54 +206,54 @@ public class InventoryApp extends JFrame implements MouseListener{
 		connectingToDBLabel = new JLabel("Connecting to database...");
 	    connectingToDBLabel.setBounds((int)(screenSize.width * 0.45), (int)(screenSize.height * 0.35), screenSize.width, screenSize.height);
 	    connectingToDBLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		connectingToDBLabel.setFont(new Font("Arial", Font.BOLD, 24));
+		connectingToDBLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/80));
 		
 		loadingPanel.add(connectingToDBLabel);
 		loadingPanel.add(connectingToDBProgressBar);
 				
 	    titleLabel = new JLabel("Inventory Management");
 	    titleLabel.setBounds(0, 0, screenSize.width, screenSize.height/10);
-	    titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+	    titleLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/40));
 	    titleLabel.setAlignmentX(CENTER_ALIGNMENT);
 	    titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	    
 	    homeButton = new JButton("Home");
 		homeButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.025), screenSize.width/5, screenSize.height/20);
-		homeButton.setFont(new Font("Arial", Font.BOLD, 36));
+		homeButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		homeButton.addMouseListener(this);
 		
 		reportsButton = new JButton("Reports");
 		reportsButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.1), screenSize.width/5, screenSize.height/20);
-		reportsButton.setFont(new Font("Arial", Font.BOLD, 36));
+		reportsButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		reportsButton.addMouseListener(this);
 		
 		restockButton = new JButton("Restock List");
 		restockButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.1), screenSize.width/5, screenSize.height/20);
-		restockButton.setFont(new Font("Arial", Font.BOLD, 36));
+		restockButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		restockButton.addMouseListener(this);
 		
 		usersButton = new JButton("Users");
 		usersButton.setBounds((int)(screenSize.width * 0.4), (int)(screenSize.height * 0.575), screenSize.width/5, screenSize.height/10);
-		usersButton.setFont(new Font("Arial", Font.BOLD, 36));
+		usersButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		usersButton.addMouseListener(this);
 		
 		itemLogButton = new JButton("Item Log");
 		itemLogButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.025), screenSize.width/5, screenSize.height/20);
-		itemLogButton.setFont(new Font("Arial", Font.BOLD, 36));
+		itemLogButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		itemLogButton.addMouseListener(this);
 		
 		editItemLogButton = new JButton("Edit Item Log");
 		editItemLogButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		editItemLogButton.setFont(new Font("Arial", Font.BOLD, 36));
+		editItemLogButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		editItemLogButton.addMouseListener(this);
 		
 		deleteItemLogButton = new JButton("Delete Item Log");
 		deleteItemLogButton.setBounds((int)(screenSize.width * 0.55), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		deleteItemLogButton.setFont(new Font("Arial", Font.BOLD, 36));
+		deleteItemLogButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		deleteItemLogButton.addMouseListener(this);
 						
 		itemsTextArea = new JTextArea("Quantity\tIn Stock\tItem\n");
-	    itemsTextArea.setFont(new Font("Arial", Font.BOLD, 28));
+	    itemsTextArea.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 	    itemsTextArea.setEditable(false);
 	    
 	    itemsScrollPane = new JScrollPane(itemsTextArea);
@@ -268,17 +268,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 		};
 	    
 	    itemTable = new JTable();
-		itemTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 20));
-		itemTable.setFont(new Font("Arial", Font.BOLD, 16));
-		itemTable.setRowHeight(50);
+		itemTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, screenSize.width/96));
+		itemTable.setFont(new Font("Arial", Font.BOLD, screenSize.width/96));
+		itemTable.setRowHeight(screenSize.width/50);
 		itemTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		itemTable.setModel(dtm);
 		itemTable.addMouseListener(this);
 		
 		kitItemTable = new JTable();
-		kitItemTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 20));
-		kitItemTable.setFont(new Font("Arial", Font.BOLD, 16));
-		kitItemTable.setRowHeight(50);
+		kitItemTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, screenSize.width/96));
+		kitItemTable.setFont(new Font("Arial", Font.BOLD, screenSize.width/96));
+		kitItemTable.setRowHeight(screenSize.width/50);
 		kitItemTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		kitItemTable.addMouseListener(this);
 	    
@@ -296,102 +296,102 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    
 		checkOutButton = new JButton("Check Out(-)");
 		checkOutButton.setBounds((int)(screenSize.width * 0.15), (int)(screenSize.height * 0.45), screenSize.width/5, screenSize.height/10);
-		checkOutButton.setFont(new Font("Arial", Font.BOLD, 36));
+		checkOutButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		checkOutButton.addMouseListener(this);
 		
 		receiveButton = new JButton("Receive(+)");
 		receiveButton.setBounds((int)(screenSize.width * 0.65), (int)(screenSize.height * 0.45), screenSize.width/5, screenSize.height/10);
-		receiveButton.setFont(new Font("Arial", Font.BOLD, 36));
+		receiveButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		receiveButton.addMouseListener(this);
 		
 		editItemButton = new JButton("Edit Item");
 		editItemButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		editItemButton.setFont(new Font("Arial", Font.BOLD, 36));
+		editItemButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		editItemButton.addMouseListener(this);
 		
 		viewKitsButton = new JButton("View Kits");
 		viewKitsButton.setBounds((int)(screenSize.width * 0.55), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		viewKitsButton.setFont(new Font("Arial", Font.BOLD, 36));
+		viewKitsButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		viewKitsButton.addMouseListener(this);
 		
 		viewItemsButton = new JButton("View Items");
 		viewItemsButton.setBounds((int)(screenSize.width * 0.4), (int)(screenSize.height * 0.7), screenSize.width/5, screenSize.height/10);
-		viewItemsButton.setFont(new Font("Arial", Font.BOLD, 36));
+		viewItemsButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		viewItemsButton.addMouseListener(this);
 		
 		doneButton = new JButton("Done");
 		doneButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		doneButton.setFont(new Font("Arial", Font.BOLD, 36));
+		doneButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		doneButton.addMouseListener(this);
 		
 		newItemButton = new JButton("New Item");
 		newItemButton.setBounds((int)(screenSize.width * 0.35), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		newItemButton.setFont(new Font("Arial", Font.BOLD, 36));
+		newItemButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		newItemButton.addMouseListener(this);
 		
 		printButton = new JButton("Print");
 		printButton.setBounds((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		printButton.setFont(new Font("Arial", Font.BOLD, 36));
+		printButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		printButton.addMouseListener(this);
 		
 		undoButton = new JButton("Undo");
 		undoButton.setBounds((int)(screenSize.width * 0.55), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		undoButton.setFont(new Font("Arial", Font.BOLD, 36));
+		undoButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		undoButton.addMouseListener(this);
 		
-		dateReportButton = new JButton("Date");
-		dateReportButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		dateReportButton.setFont(new Font("Arial", Font.BOLD, 36));
-		dateReportButton.addMouseListener(this);
+		usageReportButton = new JButton("Usage");
+		usageReportButton.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
+		usageReportButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
+		usageReportButton.addMouseListener(this);
 		
-		userReportButton = new JButton("User");
-		userReportButton.setBounds((int)(screenSize.width * 0.25), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		userReportButton.setFont(new Font("Arial", Font.BOLD, 36));
-		userReportButton.addMouseListener(this);
+		snapshotReportButton = new JButton("Snapshot");
+		snapshotReportButton.setBounds((int)(screenSize.width * 0.25), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
+		snapshotReportButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
+		snapshotReportButton.addMouseListener(this);
 		
 		productReportButton = new JButton("Product");
 		productReportButton.setBounds((int)(screenSize.width * 0.45), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		productReportButton.setFont(new Font("Arial", Font.BOLD, 36));
+		productReportButton.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		productReportButton.addMouseListener(this);
 		
 		restockingLabel = new JLabel(restockingNumber + " item(s) needs restocking", SwingConstants.CENTER);
 		restockingLabel.setBounds((int)(screenSize.width * 0.4), (int)(screenSize.height * 0.075), screenSize.width/5, screenSize.height/10);
-		restockingLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		restockingLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		
 		barcodeLabel = new JLabel("Barcode:");
 		barcodeLabel.setBounds((int)(screenSize.width * 0.15), (int)(screenSize.height * 0.75), screenSize.width/5, screenSize.height/20);
-		barcodeLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		barcodeLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		
 		barcodeTextField = new JTextField();
 		barcodeTextField.setBounds((int)(screenSize.width * 0.15), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		barcodeTextField.setFont(new Font("Arial", Font.PLAIN, 48));
+		barcodeTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/40));
 		barcodeTextField.addActionListener(barcodeScanned);
 		
 		itemSearchLabel = new JLabel("Search:");
 		itemSearchLabel.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.75), screenSize.width/5, screenSize.height/20);
-		itemSearchLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		itemSearchLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		
 		itemSearchTextField = new JTextField();
 		itemSearchTextField.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
-		itemSearchTextField.setFont(new Font("Arial", Font.PLAIN, 48));
+		itemSearchTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/40));
 		itemSearchTextField.addActionListener(itemSearched);
 		itemSearchTextField.addMouseListener(this);
 		
 		passwordField = new JPasswordField();
-		passwordField.setFont(new Font("Arial", Font.PLAIN, 28));
+		passwordField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		
 		confirmPasswordField = new JPasswordField();
-		confirmPasswordField.setFont(new Font("Arial", Font.PLAIN, 28));
+		confirmPasswordField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 
 		
 		scanQuantityLabel = new JLabel("Quantity:");
 		scanQuantityLabel.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.75), screenSize.width/5, screenSize.height/20);
-		scanQuantityLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		scanQuantityLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		
 		scanQuantity = new SpinnerNumberModel(1, 1, 1000, 1);
 		scanSpinner = new JSpinner(scanQuantity);
 		scanSpinner.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.8), screenSize.width/10, screenSize.height/10);
-		scanSpinner.setFont(new Font("Arial", Font.PLAIN, 48));
+		scanSpinner.setFont(new Font("Arial", Font.PLAIN, screenSize.width/40));
 		scanEditor = scanSpinner.getEditor();
 		if(scanEditor instanceof JSpinner.DefaultEditor) {
 			// for interactions with the scan quantity spinner
@@ -434,12 +434,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		
 		checkOutRB = new JRadioButton("Check Out(-)");
-		checkOutRB.setFont(new Font("Arial", Font.BOLD, 36));
+		checkOutRB.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		checkOutRB.setBounds((int)(screenSize.width * 0.05), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
 		checkOutRB.addMouseListener(this);
 		
 		receiveRB = new JRadioButton("Receive(+)");
-		receiveRB.setFont(new Font("Arial", Font.BOLD, 36));
+		receiveRB.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 		receiveRB.setBounds((int)(screenSize.width * 0.25), (int)(screenSize.height * 0.8), screenSize.width/5, screenSize.height/10);
 		receiveRB.addMouseListener(this);
 		
@@ -476,8 +476,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 		add(editItemLogButton);
 		add(deleteItemLogButton);
 		add(undoButton);
-		add(dateReportButton);
-		add(userReportButton);
+		add(usageReportButton);
+		add(snapshotReportButton);
 		add(productReportButton);
 		add(itemsScrollPane);
 		add(itemTableScrollPane);
@@ -501,8 +501,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 		checkOutRB.setVisible(false);
 		receiveRB.setVisible(false);
 		undoButton.setVisible(false);
-		dateReportButton.setVisible(false);
-		userReportButton.setVisible(false);
+		usageReportButton.setVisible(false);
+		snapshotReportButton.setVisible(false);
 		productReportButton.setVisible(false);
 		itemsTextArea.setVisible(false);
 		itemsScrollPane.setVisible(false);
@@ -510,10 +510,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 		setLayout(null);
 		setVisible(true);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		/*
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent componentEvent) {
+		        System.out.println(getBounds().width + " " + getBounds().height);
+		    }
+		});
+		*/
 	}
 	public static void main(String[] args) {
-		UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 28));
-		UIManager.put("OptionPane.buttonFont", new Font("Arial", Font.BOLD, 28));
+		UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, Toolkit.getDefaultToolkit().getScreenSize().width/69));
+		UIManager.put("OptionPane.buttonFont", new Font("Arial", Font.BOLD, Toolkit.getDefaultToolkit().getScreenSize().width/69));
 		try {
 	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    } 
@@ -532,11 +539,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 		connectingToDBProgressBar.setVisible(true);
 		try {
 	        Class.forName("java.sql.Driver"); // load driver
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;"); // try to connect with your attributes 
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;"); // try to connect with your attributes 
 	    } catch (ClassNotFoundException e) { // 
 	    	JOptionPane.showMessageDialog(program, "There is a problem loading the JDBC driver.", "Could not load driver", JOptionPane.WARNING_MESSAGE);	    
 	    } catch (SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem connecting to the database.", "Could not connect to DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem connecting to the database.\n" + e.toString(), "Could not connect to DB", JOptionPane.WARNING_MESSAGE);
 	    }
 		finally {
 			try { conn.close(); } catch (Exception e) { /* ignored */ }
@@ -573,7 +580,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	}
 	
 	public boolean verifyPassword(String password, String key, String salt) {
-		Optional<String> optEncrypted = hashPassword(password, salt);
+		Optional<String> optEncrypted = hashPassword(password.toUpperCase(), salt);
 		if(!optEncrypted.isPresent()) {
 			return false;
 		}
@@ -588,14 +595,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		 */
 		
 		JTextField barcode = new JTextField(20);
-		barcode.setFont(new Font("Arial", Font.PLAIN, 28));
+		barcode.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JTextField name = new JTextField(20);
-		name.setFont(new Font("Arial", Font.PLAIN, 28));
+		name.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		SpinnerModel inStockQuantity = new SpinnerNumberModel(0, 0, 1000, 1);
 		SpinnerModel restockQuantity = new SpinnerNumberModel(0, 0, 1000, 1);
 		
 		JSpinner inStock = new JSpinner(inStockQuantity);
-		inStock.setFont(new Font("Arial", Font.PLAIN, 28));
+		inStock.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JComponent inStockEditor = inStock.getEditor();
 		if(inStockEditor instanceof JSpinner.DefaultEditor) {
 			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)inStockEditor;
@@ -617,7 +624,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		
 		JSpinner restock = new JSpinner(restockQuantity);
-		restock.setFont(new Font("Arial", Font.PLAIN, 28));
+		restock.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JComponent restockEditor = restock.getEditor();
 		if(restockEditor instanceof JSpinner.DefaultEditor) {
 			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)restockEditor;
@@ -639,14 +646,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		
 		JCheckBox kitCheckBox = new JCheckBox("Kit");
-		kitCheckBox.setFont(new Font("Arial", Font.BOLD, 28));
+		kitCheckBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		kitCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		kitCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(kitCheckBox.isSelected()) {
-					inStock.setValue(0);
-					restock.setValue(0);
 					inStock.setEnabled(false);
 					restock.setEnabled(false);
 				}
@@ -660,22 +665,23 @@ public class InventoryApp extends JFrame implements MouseListener{
 		JPanel newItemPanel = new JPanel();
 		newItemPanel.setLayout(new GridLayout(5,2));
 		JLabel nameLabel = new JLabel("Name");
-		nameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		nameLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		newItemPanel.add(nameLabel);
 		newItemPanel.add(name);
 		JLabel bcLabel = new JLabel("Barcode");
-		bcLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		bcLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
+		newItemPanel.add(kitCheckBox);
+		newItemPanel.add(new JLabel(""));
 		newItemPanel.add(bcLabel);
 		newItemPanel.add(barcode);
 		JLabel inStockLabel = new JLabel("In Stock Quantity");
-		inStockLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		inStockLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		newItemPanel.add(inStockLabel);
 		newItemPanel.add(inStock);
 		JLabel restockLabel = new JLabel("Restock Quantity");
-		restockLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		restockLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		newItemPanel.add(restockLabel);
 		newItemPanel.add(restock);
-		newItemPanel.add(kitCheckBox);
 		
 		int result;
 		boolean validNewItem = false, cancel = false;
@@ -704,7 +710,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			if(result == JOptionPane.OK_OPTION && !barcode.getText().isEmpty() && !name.getText().isEmpty()) {
 				int matchingName = 0;
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=" +usernameDB + ";password=" +passwordDB  + ";");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 					// get table size
 			        String sqlStatement = "SELECT COUNT(p_id) FROM product WHERE p_name = '" + name.getText().trim() + "';";
@@ -714,7 +720,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			        }
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -742,39 +748,65 @@ public class InventoryApp extends JFrame implements MouseListener{
 					barcode.requestFocusInWindow();
 				}
 				else {
-					chooseUser();
-					if(user != null) {
-						enterPassword();
-						if(passwordCorrect) {
-							try {
-						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-								s = conn.createStatement();
-								String sqlStatement;
-								if(kitCheckBox.isSelected()) {
-						        	sqlStatement = "INSERT INTO product VALUES ('" + barcode.getText().trim() + "','" + name.getText() + "'," + inStock.getValue() + "," + restock.getValue() + ", 1);";
-								}
-								else {
+					if(kitCheckBox.isSelected()) {
+						try {
+					        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+							s = conn.createStatement();
+							String sqlStatement;
+					        sqlStatement = "INSERT INTO product VALUES ('" + barcode.getText().trim() + "','" + name.getText() + "', 0, 0, 1);";
+					        s.execute(sqlStatement);
+					        updateRestockingNumber();
+							if(titleLabel.getText().equals("View Items")) {
+								itemSearchTextField.setText(name.getText());
+								refreshItemTable();
+							}
+							else {
+								barcodeTextField.requestFocusInWindow();
+							}
+							validNewItem = true;
+						}
+						catch(SQLException e) {
+					    	JOptionPane.showMessageDialog(program, "There is a problem adding the kit into the database.\n" + e.toString(), "Could not add kit into DB", JOptionPane.WARNING_MESSAGE);
+						}
+						finally {
+							try { s.close(); } catch (Exception e) { /* ignored */ }
+							try { r.close(); } catch (Exception e) { /* ignored */ }
+							try { conn.close(); } catch (Exception e) { /* ignored */ }
+						}
+						kitName = name.getText();
+						editKit();
+					}
+					else {
+						chooseUser();
+						if(user != null) {
+							enterPassword();
+							if(passwordCorrect) {
+								try {
+							        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+									s = conn.createStatement();
+									String sqlStatement;
 									sqlStatement = "INSERT INTO product VALUES ('" + barcode.getText().trim() + "','" + name.getText() + "'," + inStock.getValue() + "," + restock.getValue() + ", 0);";
-								}
-						        s.execute(sqlStatement);
-						        updateRestockingNumber();
-								updateLog("add", (Integer)inStock.getValue(), barcode.getText().trim());
-								if(titleLabel.getText().equals("View Items")) {
+							        s.execute(sqlStatement);
+							        updateRestockingNumber();
+									updateLog("add", (Integer)inStock.getValue(), barcode.getText().trim());
+									if(titleLabel.getText().equals("View Items")) {
+										refreshItemTable();
+									}
+									else {
+										barcodeTextField.requestFocusInWindow();
+									}
+									validNewItem = true;
+									itemSearchTextField.setText(name.getText());
 									refreshItemTable();
 								}
-								else {
-									barcodeTextField.requestFocusInWindow();
+								catch(SQLException e) {
+							    	JOptionPane.showMessageDialog(program, "There is a problem adding the item into the database.\n" + e.toString(), "Could not add item into DB", JOptionPane.WARNING_MESSAGE);
 								}
-						        JOptionPane.showMessageDialog(program, "Successfully added item!", "Item creation complete", JOptionPane.PLAIN_MESSAGE);
-								validNewItem = true;
-							}
-							catch(SQLException e) {
-						    	JOptionPane.showMessageDialog(program, "There is a problem adding the item into the database.", "Could not add item into DB", JOptionPane.WARNING_MESSAGE);
-							}
-							finally {
-								try { s.close(); } catch (Exception e) { /* ignored */ }
-								try { r.close(); } catch (Exception e) { /* ignored */ }
-								try { conn.close(); } catch (Exception e) { /* ignored */ }
+								finally {
+									try { s.close(); } catch (Exception e) { /* ignored */ }
+									try { r.close(); } catch (Exception e) { /* ignored */ }
+									try { conn.close(); } catch (Exception e) { /* ignored */ }
+								}
 							}
 						}
 					}
@@ -807,16 +839,16 @@ public class InventoryApp extends JFrame implements MouseListener{
 			user = null;
 			userLines.clear();
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 				s = conn.createStatement();
-		        String sqlStatement = "SELECT e_fname, e_lname FROM employee WHERE active = 1 AND e_fname != 'Admin' ORDER BY e_fname;";
+		        String sqlStatement = "SELECT e_fname, e_lname FROM employee WHERE active = 1 ORDER BY e_fname;";
 		        r = s.executeQuery(sqlStatement);
 		        while(r.next()) {
 		        	userLines.add(r.getString(1) + " " + r.getString(2));
 		        }
 			}
 			catch(SQLException e) {
-		    	JOptionPane.showMessageDialog(program, "There is a problem finding the users in the database.", "Could not find users in DB", JOptionPane.WARNING_MESSAGE);
+		    	JOptionPane.showMessageDialog(program, "There is a problem finding the users in the database.\n" + e.toString(), "Could not find users in DB", JOptionPane.WARNING_MESSAGE);
 			}
 			finally {
 				try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -829,7 +861,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			userList.setLayoutOrientation(JList.VERTICAL);
 			userList.setVisibleRowCount(-1);
-			userList.setFont(new Font("Arial", Font.BOLD, 28));
+			userList.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 			userList.setSelectedIndex(0);
 			
 			userScrollPane = new JScrollPane(userList);
@@ -839,7 +871,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		    userScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 			
 			userPanel = new JPanel();
-			userPanel.setFont(new Font("Arial", Font.BOLD, 28));
+			userPanel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 			userScrollPane.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
 			userPanel.add(userScrollPane);
 			
@@ -849,21 +881,21 @@ public class InventoryApp extends JFrame implements MouseListener{
 			if(result == 0) {
 				JPanel userInputPanel = new JPanel();
 				JLabel newUserLabel = new JLabel("Please enter the new user details:");
-				newUserLabel.setFont(new Font("Arial", Font.BOLD, 36));
+				newUserLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 				JLabel newUserFNameLabel = new JLabel("First name:");
-				newUserFNameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				newUserFNameLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JLabel newUserLNameLabel = new JLabel("Last name:");
-				newUserLNameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				newUserLNameLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JTextField userFNameTextField = new JTextField();
-				userFNameTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+				userFNameTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 				JTextField userLNameTextField = new JTextField();
-				userLNameTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+				userLNameTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 				JLabel passwordLabel = new JLabel("Password (at least 4 characters):");
-				passwordLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				passwordLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JLabel confirmPasswordLabel = new JLabel("Confirm password:");
-				confirmPasswordLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				confirmPasswordLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JCheckBox adminCheckBox = new JCheckBox("Admin:");
-				adminCheckBox.setFont(new Font("Arial", Font.BOLD, 28));
+				adminCheckBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				adminCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
 				
 				userInputPanel.setLayout(new GridLayout(10,1));
@@ -941,17 +973,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 						String userFName = fNameSB.toString();
 						String userLName = lNameSB.toString();
 						String userSalt = generateSalt(saltLength).get();
-						String userPasswordHash = hashPassword(String.valueOf(passwordField.getPassword()), userSalt).get();
+						String userPasswordHash = hashPassword(String.valueOf(passwordField.getPassword()).toUpperCase(), userSalt).get();
 						if(!adminCheckBox.isSelected()) {
 							try {
-						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 								s = conn.createStatement();
 						        String sqlStatement = "INSERT INTO employee VALUES ('" + userLName + "', '" + userFName + "', '" + userSalt + "', '" + userPasswordHash + "', 0, 1);";
 						        s.execute(sqlStatement);
 								JOptionPane.showMessageDialog(program, "Successfully created user!", "User creation complete", JOptionPane.PLAIN_MESSAGE);
 							}
 							catch(SQLException e) {
-						    	JOptionPane.showMessageDialog(program, "There is a problem adding the user into the database.", "Could not add user into DB", JOptionPane.WARNING_MESSAGE);
+						    	JOptionPane.showMessageDialog(program, "There is a problem adding the user into the database.\n" + e.toString(), "Could not add user into DB", JOptionPane.WARNING_MESSAGE);
 							}
 							finally {
 								try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -963,14 +995,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 							enterAdminPassword();
 							if(passwordCorrect) {
 								try {
-							        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+							        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 									s = conn.createStatement();
 							        String sqlStatement = "INSERT INTO employee VALUES ('" + userLName + "', '" + userFName + "', '" + userSalt + "', '" + userPasswordHash + "', 1, 1);";
 							        s.execute(sqlStatement);
 									JOptionPane.showMessageDialog(program, "Successfully created administrator!", "Administrator creation complete", JOptionPane.PLAIN_MESSAGE);
 								}
 								catch(SQLException e) {
-							    	JOptionPane.showMessageDialog(program, "There is a problem adding the admin user into the database.", "Could not add admin user into DB", JOptionPane.WARNING_MESSAGE);
+							    	JOptionPane.showMessageDialog(program, "There is a problem adding the admin user into the database.\n" + e.toString(), "Could not add admin user into DB", JOptionPane.WARNING_MESSAGE);
 								}
 								finally {
 									try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -989,19 +1021,19 @@ public class InventoryApp extends JFrame implements MouseListener{
 			else if(result == 1) {
 				JPanel userInputPanel = new JPanel();
 				JLabel newUserLabel = new JLabel("Please enter the new user details:");
-				newUserLabel.setFont(new Font("Arial", Font.BOLD, 36));
+				newUserLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/50));
 				JLabel newUserFNameLabel = new JLabel("First name:");
-				newUserFNameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				newUserFNameLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JLabel newUserLNameLabel = new JLabel("Last name:");
-				newUserLNameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				newUserLNameLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JTextField userFNameTextField = new JTextField();
-				userFNameTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+				userFNameTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 				JTextField userLNameTextField = new JTextField();
-				userLNameTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+				userLNameTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 				JLabel passwordLabel = new JLabel("Password (at least 4 characters):");
-				passwordLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				passwordLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				JLabel confirmPasswordLabel = new JLabel("Confirm password:");
-				confirmPasswordLabel.setFont(new Font("Arial", Font.BOLD, 28));
+				confirmPasswordLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 				userInputPanel.setLayout(new GridLayout(9,1));
 				userInputPanel.add(newUserLabel);
 				userInputPanel.add(newUserFNameLabel);
@@ -1061,16 +1093,16 @@ public class InventoryApp extends JFrame implements MouseListener{
 							enterAdminPassword();
 							if(passwordCorrect) {
 								String userSalt = generateSalt(saltLength).get();
-								String userPasswordHash = hashPassword(String.valueOf(confirmPasswordField.getPassword()), userSalt).get();
+								String userPasswordHash = hashPassword(String.valueOf(confirmPasswordField.getPassword()).toUpperCase(), userSalt).get();
 								try {	
-							        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+							        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 									s = conn.createStatement();
 							        String sqlStatement = "UPDATE employee SET salt= '" + userSalt + "', password_hash= '" + userPasswordHash + "' WHERE e_fname = '" + userParts[0] + "' AND e_lname = '" + userParts[1] + "';";
 							        s.execute(sqlStatement);
 									JOptionPane.showMessageDialog(program, "Successfully changed password!", "Password change complete", JOptionPane.PLAIN_MESSAGE);
 								}
 								catch(SQLException e) {
-							    	JOptionPane.showMessageDialog(program, "There is a problem editing the password in the database.", "Could not edit password in DB", JOptionPane.WARNING_MESSAGE);
+							    	JOptionPane.showMessageDialog(program, "There is a problem editing the password in the database.\n" + e.toString(), "Could not edit password in DB", JOptionPane.WARNING_MESSAGE);
 								}
 								finally {
 									try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1094,14 +1126,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 						enterAdminPassword();
 						if(passwordCorrect) {
 							try {
-						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 								s = conn.createStatement();
 							    String sqlStatement = "UPDATE employee SET active = 0 WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
 							    s.execute(sqlStatement);
 								JOptionPane.showMessageDialog(program, "Successfully deleted user!", "User deletion complete", JOptionPane.PLAIN_MESSAGE);
 							}
 							catch(SQLException e){
-						    	JOptionPane.showMessageDialog(program, "There is a problem deleting the user from the database.", "Could not delete user from DB", JOptionPane.WARNING_MESSAGE);
+						    	JOptionPane.showMessageDialog(program, "There is a problem deleting the user from the database.\n" + e.toString(), "Could not delete user from DB", JOptionPane.WARNING_MESSAGE);
 							}
 							finally {
 								try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1133,7 +1165,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			String[] userParts = new String[2];
 			userParts = userName.split("\\s+");
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 				s = conn.createStatement();
 		        String sqlStatement;
 		        sqlStatement = "SELECT e_id FROM employee WHERE e_fname = '" + userParts[0] + "' AND e_lname = '" + userParts[1] + "';";
@@ -1143,7 +1175,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		        }
 			}
 			catch(SQLException e) {
-		    	JOptionPane.showMessageDialog(program, "There is a problem finding the employee id from the database.", "Could not get employee id from DB", JOptionPane.WARNING_MESSAGE);
+		    	JOptionPane.showMessageDialog(program, "There is a problem finding the employee id from the database.\n" + e.toString(), "Could not get employee id from DB", JOptionPane.WARNING_MESSAGE);
 			}
 			finally {
 				try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1156,7 +1188,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	public String getProductID(String productName) {
 		String pid = "";
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement;
 	        sqlStatement = "SELECT p_id FROM product WHERE p_name = '" + productName + "';";
@@ -1166,7 +1198,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem find the product id from the database.", "Could not get product id from DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem finding the product id from the database.\n" + e.toString(), "Could not get product id from DB", JOptionPane.WARNING_MESSAGE);
 		}
 		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1189,9 +1221,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 		while(!validItem) {
 			JPanel barcodeInputPanel = new JPanel();
 			JLabel editItemLabel = new JLabel("Please enter the barcode or keyword of the item:");
-			editItemLabel.setFont(new Font("Arial", Font.BOLD, 28));
+			editItemLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 			JTextField barcodeTextField = new JTextField();
-			barcodeTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+			barcodeTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 			barcodeInputPanel.setLayout(new GridLayout(2,1));
 			barcodeInputPanel.add(editItemLabel);
 			barcodeInputPanel.add(barcodeTextField);
@@ -1253,18 +1285,24 @@ public class InventoryApp extends JFrame implements MouseListener{
 		month = currentMonth;
 		day = currentDay;
 		yearRB = new JRadioButton("Year");
-		yearRB.setFont(new Font("Arial", Font.BOLD, 28));
+		yearRB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		monthRB = new JRadioButton("Month");
-		monthRB.setFont(new Font("Arial", Font.BOLD, 28));
+		monthRB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		dayRB = new JRadioButton("Day");
-		dayRB.setFont(new Font("Arial", Font.BOLD, 28));
+		dayRB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(yearRB);
 		bg.add(monthRB);
 		bg.add(dayRB);
-		monthRB.setSelected(true);
+		if(titleLabel.getText().equals("Reports") && reportType.equals("Snapshot")) {
+			dayRB.setSelected(true);
+		}
+		else {
+			monthRB.setSelected(true);
+
+		}
 		yearComboBox = new JComboBox<Integer>();
-		yearComboBox.setFont(new Font("Arial", Font.BOLD, 28));
+		yearComboBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		yearComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1292,7 +1330,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 		});
 		monthComboBox = new JComboBox<String>(months);
-		monthComboBox.setFont(new Font("Arial", Font.BOLD, 28));
+		monthComboBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		monthComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1320,20 +1358,44 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 		});
 		dayComboBox = new JComboBox<Integer>();
-		dayComboBox.setFont(new Font("Arial", Font.BOLD, 28));
+		dayComboBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
+		dayRB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(dayRB.isSelected()) {
+					int month = 1;
+					int selectedDay = dayComboBox.getSelectedIndex() + 1;
+					try {
+						Date selectedDate = new SimpleDateFormat("MMMM", Locale.ENGLISH).parse(monthComboBox.getSelectedItem().toString());
+						Calendar cal = Calendar.getInstance();
+						cal.setTime(selectedDate);
+						month = cal.get(Calendar.MONTH) + 1;
+					}
+					catch(Exception e) {
+						
+					}
+					YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(yearComboBox.getSelectedItem().toString()), month);
+					dayComboBox.removeAllItems();
+					for(int i = 0; i < yearMonthObject.lengthOfMonth(); i++) {
+						dayComboBox.addItem((Integer)(i + 1));
+					}
+					if(dayComboBox.getItemCount() >= selectedDay) {
+						dayComboBox.setSelectedItem(selectedDay);
+					}
+				}
+			}
+		});
 		for(int i = 0 ; i < 31; i ++) {
 			dayComboBox.addItem(i + 1);
 		}
-		dayComboBox.setEnabled(false);
-		if(titleLabel.getText().equals("Reports")) {
-			yearRB.setSelected(true);
-			monthRB.setEnabled(false);
-			dayRB.setEnabled(false);
-			monthComboBox.setEnabled(false);
+		if(titleLabel.getText().equals("Reports") && reportType.equals("Snapshot")) {
+			dayComboBox.setEnabled(true);
+		}
+		else {
 			dayComboBox.setEnabled(false);
 		}
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 		    String sqlStatement = "SELECT MIN(YEAR(co_date)) FROM checkout;";
 		    r = s.executeQuery(sqlStatement);
@@ -1348,7 +1410,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem detecting the years available.", "Could not find years from DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem detecting the years available.\n" + e.toString(), "Could not find years from DB", JOptionPane.WARNING_MESSAGE);
 		}
 		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1360,7 +1422,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 		bg.add(dayRB);
 		yearComboBox.setSelectedItem(currentYear);
 		monthComboBox.setSelectedIndex(currentMonth - 1);
-		dayComboBox.setSelectedItem(currentDay);
+		if(titleLabel.getText().equals("Reports") && reportType.equals("Snapshot")) {
+			dayComboBox.setSelectedIndex(0);
+		}
+		else {
+			dayComboBox.setSelectedItem(currentDay);
+		}
 		yearRB.addMouseListener(this);
 		monthRB.addMouseListener(this);
 		dayRB.addMouseListener(this);
@@ -1370,6 +1437,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 		chooseDatePanel.add(monthComboBox);
 		chooseDatePanel.add(dayRB);
 		chooseDatePanel.add(dayComboBox);
+		if(titleLabel.getText().equals("Reports") && reportType.equals("Snapshot")) {
+			monthRB.setEnabled(false);
+			yearRB.setEnabled(false);
+		}
 		int dateResult;
 		dateResult = JOptionPane.showConfirmDialog(program, chooseDatePanel, "Choose Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		if(dateResult == JOptionPane.OK_OPTION) {
@@ -1398,6 +1469,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		barcodeItem[2] = itemTable.getValueAt(itemTable.getSelectedRow(), 2).toString();
 		barcodeItem[3] = itemTable.getValueAt(itemTable.getSelectedRow(), 3).toString();
 		barcodeItem[4] = itemTable.getValueAt(itemTable.getSelectedRow(), 4).toString();
+		int originalStock = Integer.parseInt(barcodeItem[2]);
 		if(barcodeItem[4].equals("Yes")) {
 			barcodeItem[4] = "1";
 		}
@@ -1405,14 +1477,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 			barcodeItem[4] = "0";
 		}
 		
-		JTextField name = new JTextField();
+		JTextField name = new JTextField(50);
 		name.setText(barcodeItem[1]);
-		name.setFont(new Font("Arial", Font.PLAIN, 28));
+		name.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		SpinnerModel inStockQuantity = new SpinnerNumberModel(Integer.parseInt(barcodeItem[2]), 0, 1000, 1);
 		SpinnerModel restockQuantity = new SpinnerNumberModel(Integer.parseInt(barcodeItem[3]), 0, 1000, 1);
 		
 		JSpinner inStock = new JSpinner(inStockQuantity);
-		inStock.setFont(new Font("Arial", Font.PLAIN, 28));
+		inStock.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JComponent inStockEditor = inStock.getEditor();
 		if(inStockEditor instanceof JSpinner.DefaultEditor) {
 			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)inStockEditor;
@@ -1434,7 +1506,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		
 		JSpinner restock = new JSpinner(restockQuantity);
-		restock.setFont(new Font("Arial", Font.PLAIN, 28));
+		restock.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JComponent restockEditor = restock.getEditor();
 		if(restockEditor instanceof JSpinner.DefaultEditor) {
 			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)restockEditor;
@@ -1458,26 +1530,16 @@ public class InventoryApp extends JFrame implements MouseListener{
 		editItemPanel = new JPanel();
 		editItemPanel.setLayout(new GridLayout(8,1));
 		JLabel nameLabel = new JLabel("Name");
-		nameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		nameLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		editItemPanel.add(nameLabel);
 		editItemPanel.add(name);
-		JLabel inStockLabel = new JLabel("In Stock Quantity");
-		inStockLabel.setFont(new Font("Arial", Font.BOLD, 28));
-		editItemPanel.add(inStockLabel);
-		editItemPanel.add(inStock);
-		JLabel restockLabel = new JLabel("Restock Quantity");
-		restockLabel.setFont(new Font("Arial", Font.BOLD, 28));
-		editItemPanel.add(restockLabel);
-		editItemPanel.add(restock);
 		JCheckBox kitCheckBox = new JCheckBox("Kit");
-		kitCheckBox.setFont(new Font("Arial", Font.BOLD, 28));
+		kitCheckBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		kitCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		kitCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(kitCheckBox.isSelected()) {
-					inStock.setValue(0);
-					restock.setValue(0);
 					inStock.setEnabled(false);
 					restock.setEnabled(false);
 				}
@@ -1494,6 +1556,15 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		
 		editItemPanel.add(kitCheckBox);
+		JLabel inStockLabel = new JLabel("In Stock Quantity");
+		inStockLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
+		editItemPanel.add(inStockLabel);
+		editItemPanel.add(inStock);
+		JLabel restockLabel = new JLabel("Restock Quantity");
+		restockLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
+		editItemPanel.add(restockLabel);
+		editItemPanel.add(restock);
+		
 		
 		int result;
 		boolean cancel = false;
@@ -1536,25 +1607,47 @@ public class InventoryApp extends JFrame implements MouseListener{
 				enterAdminPassword();
 				if(passwordCorrect) {
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement;
 				        if(kitCheckBox.isSelected()) {
-				        	sqlStatement = "UPDATE product SET p_name = '" + name.getText() + "', instock= " + inStock.getValue() + ", restock= " + restock.getValue() + ", kit = " + 1 + " WHERE p_id = '" + barcodeItem[0] + "';";
+				        	sqlStatement = "UPDATE product SET p_name = '" + name.getText() + "', instock= 0, restock= 0, kit = 1 WHERE p_id = '" + barcodeItem[0] + "';";
 				        }
 				        else {
-				        	sqlStatement = "UPDATE product SET p_name = '" + name.getText() + "', instock= " + inStock.getValue() + ", restock= " + restock.getValue() + ", kit = " + 0 + " WHERE p_id = '" + barcodeItem[0] + "';";
+				        	sqlStatement = "UPDATE product SET p_name = '" + name.getText() + "', instock= " + inStock.getValue() + ", restock= " + restock.getValue() + ", kit = 0 WHERE p_id = '" + barcodeItem[0] + "';";
 				        }
 				        s.execute(sqlStatement);
-						updateRestockingNumber();
 						// updateLog("new", Integer.parseInt(inStock.getValue().toString()), name.getText());
 						refreshItemTable();
-						JOptionPane.showMessageDialog(program, "Successfully edited item!", "Item edit complete", JOptionPane.PLAIN_MESSAGE);
 						updateRestockingNumber();
 						cancel = true;
 					}
 					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem editing the item in the database.", "Could not edit item in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem editing the item in the database.\n" + e.toString(), "Could not edit item in DB", JOptionPane.WARNING_MESSAGE);
+					}
+					finally {
+						try { s.close(); } catch (Exception e) { /* ignored */ }
+						try { r.close(); } catch (Exception e) { /* ignored */ }
+						try { conn.close(); } catch (Exception e) { /* ignored */ }
+					}
+					
+					// add to edited table
+					
+					try {	
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+						s = conn.createStatement();
+				        String sqlStatement;
+				        int difference = (Integer.parseInt(inStock.getValue().toString()) - originalStock);
+				        sqlStatement = "INSERT INTO edited VALUES('" + barcodeItem[0] + "', " + difference +  ", GETDATE());";
+				        if(difference != 0) {	
+				        	s.execute(sqlStatement);
+				        }
+						updateRestockingNumber();
+						refreshItemTable();
+						cancel = true;
+					}
+					catch(SQLException e) {
+				    	JOptionPane.showMessageDialog(program, "There is a problem editing the item in the database.\n" + e.toString(), "Could not edit item in DB", JOptionPane.WARNING_MESSAGE);
 					}
 					finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1578,7 +1671,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    kitItemTableScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);	 
 		
 		editKitPanel = new JPanel();
-		editKitPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		editKitPanel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		editKitPanel.add(kitItemTableScrollPane);
 		
 		String[] options = {"Add Kit Item", "Edit Kit Item", "Delete Kit Item", "Cancel"};
@@ -1623,14 +1716,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 				enterAdminPassword();
 				if(passwordCorrect) {
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement = "DELETE FROM kitItem WHERE kitItem_id = " + kitItemTable.getModel().getValueAt(kitItemTable.getSelectedRow(), kitItemTable.getModel().getColumnCount() - 1) + ";";
 				        s.execute(sqlStatement);
 					}
 					catch(SQLException e) {
-						e.printStackTrace();
-				    	JOptionPane.showMessageDialog(program, "There is a problem deleting the kit item from the database.", "Could not delete kit item from DB", JOptionPane.WARNING_MESSAGE);
+						
+				    	JOptionPane.showMessageDialog(program, "There is a problem deleting the kit item from the database.\n" + e.toString(), "Could not delete kit item from DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) {    }
@@ -1644,7 +1737,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			// gets current kit items
 			ArrayList<String> kitItems = new ArrayList<String>();
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 				s = conn.createStatement();
 		        String sqlStatement = "SELECT p1.p_name FROM (kitItem LEFT JOIN product p1 ON kitItem.kitItem_product = p1.p_id) LEFT JOIN product ON kitItem.kit_product = product.p_id WHERE product.p_name = '" + kitName +"';";
 		        r = s.executeQuery(sqlStatement);
@@ -1653,8 +1746,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 		        }
 			}
 			catch(SQLException e) {
-				e.printStackTrace();
-		    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit items in the database.", "Could not find kit items in DB", JOptionPane.WARNING_MESSAGE);
+				
+		    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit items in the database.\n" + e.toString(), "Could not find kit items in DB", JOptionPane.WARNING_MESSAGE);
 			}
 	 		finally {
 				try { s.close(); } catch (Exception e) {    }
@@ -1663,10 +1756,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			
 			JLabel quantityLabel = new JLabel("Quantity");
-			quantityLabel.setFont(new Font("Arial", Font.BOLD, 28));
+			quantityLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 			SpinnerModel quantitySpinner = new SpinnerNumberModel(1, 1, 1000, 1);
 			JSpinner quantity = new JSpinner(quantitySpinner);
-			quantity.setFont(new Font("Arial", Font.PLAIN, 28));
+			quantity.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 			JComponent quantityEditor = quantity.getEditor();
 			if(quantityEditor instanceof JSpinner.DefaultEditor) {
 				JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)quantityEditor;
@@ -1687,9 +1780,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 				});
 			}
 			JLabel productLabel = new JLabel("Product");
-			productLabel.setFont(new Font("Arial", Font.BOLD, 28));
+			productLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 			JTextField productTextField = new JTextField(20);
-			productTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+			productTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 			productTextField.addFocusListener(new FocusListener() {
 				@Override
 				public void focusGained(FocusEvent e) {
@@ -1744,7 +1837,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 				else {
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement;
 				        if(option.equals("add")) {
@@ -1754,11 +1847,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        	sqlStatement = "UPDATE kitItem SET quantity = " + quantity.getValue() + ", kitItem_product = (SELECT p_id FROM product WHERE p_name = '" + kitItem + "') WHERE kitItem_id = " + kitItemTable.getModel().getValueAt(kitItemTable.getSelectedRow(), kitItemTable.getModel().getColumnCount() - 1) + ";";
 				        }
 				        s.execute(sqlStatement);
-						JOptionPane.showMessageDialog(program, "Successfully edited kit item!", "Kit item edit complete", JOptionPane.PLAIN_MESSAGE);
 						cancel = true;
 					}
 					catch(SQLException e) {
-						JOptionPane.showMessageDialog(program, "There is a problem editing the kit item in the database.", "Could not edit kit item in DB", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(program, "There is a problem editing the kit item in the database.\n" + e.toString(), "Could not edit kit item in DB", JOptionPane.WARNING_MESSAGE);
 					}
 					finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1776,7 +1868,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		while(!passwordAccepted) {
 			JPanel passwordInputPanel = new JPanel();
 			JLabel enterPasswordLabel = new JLabel("Please enter password for " + user + ":");
-			enterPasswordLabel.setFont(new Font("Arial", Font.BOLD, 28));
+			enterPasswordLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 			passwordField.setText("");
 			confirmPasswordField.setText("");
 			passwordInputPanel.setLayout(new GridLayout(2,1));
@@ -1807,7 +1899,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				String[] userParts = new String[2];
 				userParts = user.split("\\s+");
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 			        String sqlStatement = "SELECT salt, password_hash FROM employee WHERE (e_fname = '" + userParts[0] + "' AND e_lname = '" + userParts[1] + "') OR admin = 1;";
 			        r = s.executeQuery(sqlStatement);
@@ -1820,7 +1912,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			        }
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem validating your password.", "Could not validate password", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem validating your password.\n" + e.toString(), "Could not validate password", JOptionPane.WARNING_MESSAGE);
 				}
 				finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1842,7 +1934,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		passwordCorrect = false;
 		boolean passwordAccepted = false;
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT salt, password_hash FROM employee WHERE admin = 1;";
 	        r = s.executeQuery(sqlStatement);
@@ -1852,7 +1944,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem retrieving admin credentials.", "Could not retrieve admin credentials", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem retrieving admin credentials.\n" + e.toString(), "Could not retrieve admin credentials", JOptionPane.WARNING_MESSAGE);
 		}
 		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -1861,7 +1953,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		JPanel passwordInputPanel = new JPanel();
 		JLabel enterPasswordLabel = new JLabel("Please enter password for an admin user:");
-		enterPasswordLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		enterPasswordLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		passwordInputPanel.setLayout(new GridLayout(2,1));
 		passwordInputPanel.add(enterPasswordLabel);
 		
@@ -1922,7 +2014,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		        	}
 					// updating the inventory
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement;
 				        if(titleLabel.getText().equals("Check Out(-) Item Log")) {
@@ -1934,8 +2026,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        s.execute(sqlStatement);
 					}
 					catch(SQLException e) {
-						e.printStackTrace();
-				    	JOptionPane.showMessageDialog(program, "There is a problem deleting the item logs from the database.", "Could not delete item logs from DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem deleting the item logs from the database.\n" + e.toString(), "Could not delete item logs from DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) {    }
@@ -1944,7 +2035,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 					// deleting the record
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement;
 				        if(titleLabel.getText().equals("Check Out(-) Item Log")) {
@@ -1956,8 +2047,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        s.execute(sqlStatement);
 					}
 					catch(SQLException e) {
-						e.printStackTrace();
-				    	JOptionPane.showMessageDialog(program, "There is a problem deleting the item logs from the database.", "Could not delete item logs from DB", JOptionPane.WARNING_MESSAGE);
+						
+				    	JOptionPane.showMessageDialog(program, "There is a problem deleting the item logs from the database.\n" + e.toString(), "Could not delete item logs from DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) {    }
@@ -1966,38 +2057,33 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 				}
 				sortByAndShow();
-				JOptionPane.showMessageDialog(program, "Successfully deleted item logs!", "Deletion complete", JOptionPane.PLAIN_MESSAGE);
 			}
 		}
 	}
 	public void editItemLog(int itemLogNumber) {
 		JPanel editItemLogPanel = new JPanel();
 		JLabel editItemLogLabel = new JLabel("Edit the information of the item log:");
-		editItemLogLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		editItemLogLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		JLabel editDateLabel = new JLabel("Date (YYYY-MM-DD):");
-		editDateLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		editDateLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		JTextField dateTextField = new JTextField();
-		dateTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+		dateTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JLabel editUserLabel = new JLabel("User:");
-		editUserLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		editUserLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		JTextField userTextField = new JTextField();
-		userTextField.setFont(new Font("Arial", Font.PLAIN, 28));
-		JLabel editItemLabel = new JLabel("Item:");
-		editItemLabel.setFont(new Font("Arial", Font.BOLD, 28));
-		JTextField itemTextField = new JTextField();
-		itemTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+		userTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JLabel editAccountNumLabel = new JLabel("Account Number:");
-		editAccountNumLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		editAccountNumLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		JTextField accountNumTextField = new JTextField();
-		accountNumTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+		accountNumTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JLabel editAddressLabel = new JLabel("Address:");
-		editAddressLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		editAddressLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		JTextField addressTextField = new JTextField();
-		addressTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+		addressTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		JLabel editNotesLabel = new JLabel("Notes:");
-		editNotesLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		editNotesLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		JTextField notesTextField = new JTextField();
-		notesTextField.setFont(new Font("Arial", Font.PLAIN, 28));
+		notesTextField.setFont(new Font("Arial", Font.PLAIN, screenSize.width/69));
 		
 		JCheckBox statusCheckBox = new JCheckBox();
 		if(checkOutRB.isSelected()) {
@@ -2006,42 +2092,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		else {
 			statusCheckBox.setText("Returned:");
 		}
-		statusCheckBox.setFont(new Font("Arial", Font.BOLD, 28));
+		statusCheckBox.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		statusCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
-		
-		JLabel editQuantityLabel = new JLabel("Quantity:");
-		editQuantityLabel.setFont(new Font("Arial", Font.BOLD, 28));
-		
-		SpinnerModel quantity = new SpinnerNumberModel(0, 0, 1000, 1);
-		JSpinner quantitySpinner = new JSpinner(quantity);
-		quantitySpinner.setFont(new Font("Arial", Font.PLAIN, 28));
-
-		
-		if(quantitySpinner.getEditor() instanceof JSpinner.DefaultEditor) {
-			JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor)quantitySpinner.getEditor();
-			spinnerEditor.getTextField().setHorizontalAlignment(JTextField.LEFT);
-			spinnerEditor.getTextField().addFocusListener(new FocusListener() {
-				public void focusGained(FocusEvent e) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							spinnerEditor.getTextField().selectAll();
-						}
-					});
-				}
-				@Override
-				public void focusLost(FocusEvent e) {
-					
-				}
-			});
-		}
 		
 		accountNumTextField.setText("");
 		addressTextField.setText("");
 		notesTextField.setText("");
 		
 		int[] selectedRows = itemTable.getSelectedRows();
-		int previousValue = 0;
 		
 		for(int i = 0; i < itemTable.getColumnCount(); i++) {
 			if(itemTable.getColumnName(i).equals("Date")) {
@@ -2049,13 +2107,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			else if(itemTable.getColumnName(i).equals("User") && itemTable.getValueAt(itemTable.getSelectedRow(), i) != null) {
 				userTextField.setText((itemTable.getValueAt(itemTable.getSelectedRow(), i).toString()));
-			}
-			else if(itemTable.getColumnName(i).equals("Product") && itemTable.getValueAt(itemTable.getSelectedRow(), i) != null) {
-				itemTextField.setText((itemTable.getValueAt(itemTable.getSelectedRow(), i).toString()));
-			}
-			else if(itemTable.getColumnName(i).equals("Quantity") && itemTable.getValueAt(itemTable.getSelectedRow(), i) != null) {
-				quantitySpinner.setValue(Integer.parseInt((itemTable.getValueAt(itemTable.getSelectedRow(), i).toString())));
-				previousValue = Integer.parseInt(quantitySpinner.getValue().toString());
 			}
 			else if(itemTable.getColumnName(i).equals("Account No.") && itemTable.getValueAt(itemTable.getSelectedRow(), i) != null) {
 				accountNumTextField.setText((itemTable.getValueAt(itemTable.getSelectedRow(), i).toString()));
@@ -2076,23 +2127,12 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 		}
 		
-		if(titleLabel.getText().equals("Receive(+) Item Log") && selectedRows.length == 1) {
-			editItemLogPanel.setLayout(new GridLayout(16,1));
-		}
-		else {
-			editItemLogPanel.setLayout(new GridLayout(14,1));
-		}
+		editItemLogPanel.setLayout(new GridLayout(12,1));
 		editItemLogPanel.add(editItemLogLabel);
 		editItemLogPanel.add(editDateLabel);
 		editItemLogPanel.add(dateTextField);
 		editItemLogPanel.add(editUserLabel);
 		editItemLogPanel.add(userTextField);
-		editItemLogPanel.add(editItemLabel);
-		editItemLogPanel.add(itemTextField);
-		if(titleLabel.getText().equals("Receive(+) Item Log") && selectedRows.length == 1) {
-			editItemLogPanel.add(editQuantityLabel);
-			editItemLogPanel.add(quantitySpinner);
-		}
 		editItemLogPanel.add(editAccountNumLabel);
 		editItemLogPanel.add(accountNumTextField);
 		editItemLogPanel.add(editAddressLabel);
@@ -2144,32 +2184,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 			public void mouseReleased(MouseEvent e) {
 			}
 		});
-		itemTextField.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				chooseBarcodeOrKeyword();
-				if(barcodeItem[0] != null) {
-					itemTextField.setText(barcodeItem[1]);
-				}
-				dateTextField.requestFocusInWindow();
-				itemTable.getSelectionModel().removeSelectionInterval(0, 0);
-				for(int i = 0; i < selectedRows.length; i++) {
-					itemTable.getSelectionModel().addSelectionInterval(selectedRows[i], selectedRows[i]);
-				}
-			}
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-		});
 		int itemLogResult;
 		boolean validDate = false, cancel = false;
 		while(!cancel) {
@@ -2179,7 +2193,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 			Date editedDate = new Date();
 			if(itemLogResult == JOptionPane.OK_OPTION) {
 				int e_id = getEmployeeID(userTextField.getText());
-				String p_id = getProductID(itemTextField.getText());
 				try {
 					editedDate = sdf.parse(dateTextField.getText());
 					validDate = true;
@@ -2206,27 +2219,24 @@ public class InventoryApp extends JFrame implements MouseListener{
 					if(itemTable.getSelectedRowCount() > 1) {
 						JPanel editItemLogFieldsPanel = new JPanel();
 						JLabel editItemLogFieldsLabel = new JLabel("Select the fields you want to edit in the " + itemTable.getSelectedRowCount() + " records:");
-						editItemLogFieldsLabel.setFont(new Font("Arial", Font.BOLD, 28));
+						editItemLogFieldsLabel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						JCheckBox dateCB = new JCheckBox("Date");
-						dateCB.setFont(new Font("Arial", Font.BOLD, 28));
+						dateCB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						dateCB.setHorizontalTextPosition(SwingConstants.LEFT);
 						JCheckBox userCB = new JCheckBox("User");
-						userCB.setFont(new Font("Arial", Font.BOLD, 28));
+						userCB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						userCB.setHorizontalTextPosition(SwingConstants.LEFT);
-						JCheckBox productCB = new JCheckBox("Product");
-						productCB.setFont(new Font("Arial", Font.BOLD, 28));
-						productCB.setHorizontalTextPosition(SwingConstants.LEFT);
 						JCheckBox accountCB = new JCheckBox("Account No.");
-						accountCB.setFont(new Font("Arial", Font.BOLD, 28));
+						accountCB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						accountCB.setHorizontalTextPosition(SwingConstants.LEFT);
 						JCheckBox addressCB = new JCheckBox("Address");
-						addressCB.setFont(new Font("Arial", Font.BOLD, 28));
+						addressCB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						addressCB.setHorizontalTextPosition(SwingConstants.LEFT);
 						JCheckBox statusCB = new JCheckBox();
-						statusCB.setFont(new Font("Arial", Font.BOLD, 28));
+						statusCB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						statusCB.setHorizontalTextPosition(SwingConstants.LEFT);
 						JCheckBox notesCB = new JCheckBox("Notes");
-						notesCB.setFont(new Font("Arial", Font.BOLD, 28));
+						notesCB.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 						notesCB.setHorizontalTextPosition(SwingConstants.LEFT);
 						
 						if(checkOutRB.isSelected()) {
@@ -2236,11 +2246,10 @@ public class InventoryApp extends JFrame implements MouseListener{
 							statusCB.setText("Returned");
 						}
 						
-						editItemLogFieldsPanel.setLayout(new GridLayout(8,1));
+						editItemLogFieldsPanel.setLayout(new GridLayout(7,1));
 						editItemLogFieldsPanel.add(editItemLogFieldsLabel);
 						editItemLogFieldsPanel.add(dateCB);
 						editItemLogFieldsPanel.add(userCB);
-						editItemLogFieldsPanel.add(productCB);
 						editItemLogFieldsPanel.add(accountCB);
 						editItemLogFieldsPanel.add(addressCB);
 						editItemLogFieldsPanel.add(statusCB);
@@ -2260,9 +2269,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 							}
 							if(userCB.isSelected()) {
 								editOptions += "e_id = " + e_id + ", ";
-							}
-							if(productCB.isSelected()) {
-								editOptions += "p_id = '" + p_id + "', ";
 							}
 							if(accountCB.isSelected()) {
 								editOptions += "acc_id = '" + accountNumTextField.getText() + "', ";
@@ -2299,7 +2305,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 								editOptions = editOptions.substring(0, editOptions.length() - 2);
 								for(int i = 0; i < selectedRows.length; i++) {
 									try {	
-								        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+								        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 										s = conn.createStatement();
 										String sqlStatement;
 										if(checkOutRB.isSelected()) {
@@ -2308,13 +2314,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 										else {
 								        	sqlStatement = "UPDATE receive " + editOptions + " WHERE rc_id = " + itemTable.getModel().getValueAt(selectedRows[i], itemTable.getModel().getColumnCount() - 1) + ";";
 										}
-								        s.execute(sqlStatement);
-								        sortByAndShow();
-								        
+								        s.execute(sqlStatement);								        
 									}
 									catch(SQLException e) {
-								    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.", "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
-								    	e.printStackTrace();
+								    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.\n" + e.toString(), "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
+								    	
 									}
 									finally {
 										try { s.close(); } catch (Exception e) {  }
@@ -2322,31 +2326,31 @@ public class InventoryApp extends JFrame implements MouseListener{
 										try { conn.close(); } catch (Exception e) {  }
 									}
 								}
-								JOptionPane.showMessageDialog(program, "Successfully updated item logs!", "Update complete", JOptionPane.PLAIN_MESSAGE);
+								sortByAndShow();
 								cancel = true;
 							}
 						}
 					}
 					else {
 						try {	
-					        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+					        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 							s = conn.createStatement();
 							String sqlStatement;
 							if(checkOutRB.isSelected()) {
 								if(!statusCheckBox.isSelected()) {
-					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 0, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 0, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 					        		
 								}
 								else {
-					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 1, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE checkout SET co_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', defective = 1, notes = '" + notesTextField.getText() + "' WHERE co_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 								}
 							}
 							else {
 								if(!statusCheckBox.isSelected()) {
-					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 0, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 0, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 								}
 								else {
-					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", p_id = '" + p_id + "', acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 1, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
+					        		sqlStatement = "UPDATE receive SET rc_date = '" + sdf.format(editedDate) + "', e_id = " + e_id + ", acc_id = '" + accountNumTextField.getText() + "', address= '" + addressTextField.getText() + "', returned = 1, notes = '" + notesTextField.getText() + "' WHERE rc_id = " + itemTable.getModel().getValueAt(itemTable.getSelectedRow(), itemTable.getModel().getColumnCount() - 1) + ";";
 								}
 							}
 					        s.execute(sqlStatement);
@@ -2354,34 +2358,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 					        
 						}
 						catch(SQLException e) {
-					    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.", "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
-					    	e.printStackTrace();
+					    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.\n" + e.toString(), "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
+					    	
 						}
 						finally {
 							try { s.close(); } catch (Exception e) {  }
 							try { r.close(); } catch (Exception e) {  }
 							try { conn.close(); } catch (Exception e) {  }
 						}
-						if(previousValue != Integer.parseInt(quantitySpinner.getValue().toString())) {
-							try {	
-								conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-								s = conn.createStatement();
-						        String sqlStatement = "";
-						        s.execute(sqlStatement);
-						        sortByAndShow();
-						        
-							}
-							catch(SQLException e) {
-						    	JOptionPane.showMessageDialog(program, "There is a problem editing the item log in the database.", "Could not edit item log in DB", JOptionPane.WARNING_MESSAGE);
-						    	e.printStackTrace();
-							}
-							finally {
-								try { s.close(); } catch (Exception e) {  }
-								try { r.close(); } catch (Exception e) {  }
-								try { conn.close(); } catch (Exception e) {  }
-							}
-						}
-						JOptionPane.showMessageDialog(program, "Successfully updated item logs!", "Update complete", JOptionPane.PLAIN_MESSAGE);
 						cancel = true;
 					}
 				}
@@ -2405,14 +2389,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		user = null;
 		userLines.clear();
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement;
 	        if(titleLabel.getText().equals("Check Out(-) Item Log") || titleLabel.getText().equals("Receive(+) Item Log")) {
-	        	sqlStatement = "SELECT e_fname, e_lname FROM employee WHERE e_fname != 'Admin' ORDER BY e_fname;";
+	        	sqlStatement = "SELECT e_fname, e_lname FROM employee ORDER BY e_fname;";
 	        }
 	        else {
-	        	sqlStatement = "SELECT e_fname, e_lname FROM employee WHERE active = 1 AND e_fname != 'Admin' ORDER BY e_fname;";
+	        	sqlStatement = "SELECT e_fname, e_lname FROM employee WHERE active = 1 ORDER BY e_fname;";
 	        }
 	        r = s.executeQuery(sqlStatement);
 	        while(r.next()) {
@@ -2420,7 +2404,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem loading the users from the database.", "Could not load users from DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem loading the users from the database.\n" + e.toString(), "Could not load users from DB", JOptionPane.WARNING_MESSAGE);
 		}
 		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2434,7 +2418,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		userList.setLayoutOrientation(JList.VERTICAL);
 		userList.setVisibleRowCount(-1);
 		userList.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
-		userList.setFont(new Font("Arial", Font.BOLD, 28));
+		userList.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		userList.addMouseListener(this);
 		
 		userScrollPane = new JScrollPane(userList);
@@ -2444,7 +2428,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    userScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		userPanel = new JPanel();
-		userPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		userPanel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		userPanel.add(userScrollPane);
 		
 		int result;
@@ -2472,16 +2456,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 	}
 	public void chooseSortBy() {
 		sortByName = "";
-		if(receiveRB.isSelected()) {
-			sortByList = new JList<String>(new String[]{"Date", "User", "Product"});
-		}
-		else {
-			sortByList = new JList<String>(sortBy);
-		}
+		sortByList = new JList<String>(sortBy);
 		sortByList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sortByList.setLayoutOrientation(JList.VERTICAL);
 		sortByList.setVisibleRowCount(-1);
-		sortByList.setFont(new Font("Arial", Font.BOLD, 28));
+		sortByList.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		sortByList.setSelectedIndex(0);
 		sortByList.addMouseListener(this);
 		
@@ -2492,14 +2471,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    sortByScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
 		sortByPanel = new JPanel();
-		sortByPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		sortByPanel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		sortByScrollPane.setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
 		sortByPanel.add(sortByScrollPane);
 		
 		int result = JOptionPane.showConfirmDialog(program, sortByPanel, "Sort Item Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		if(result == JOptionPane.OK_OPTION) {
-			if(sortByList.getSelectedValue().equals("Not Installed")) {
-				sortByName = "Not Installed";
+			if(sortByList.getSelectedValue().equals("Past 4 Weeks")) {
+				sortByName = "Past 4 Weeks";
 				sortByAndShow();
 			}
 			else if(sortByList.getSelectedValue().equals("Date")) {
@@ -2525,47 +2504,91 @@ public class InventoryApp extends JFrame implements MouseListener{
 		int count = 0;
 		values = null;
 		fields =  new String[] {"Date", "User", "Product", "Account No.", "Address", "Defective", "Notes", "Log No."};
-		if(sortByName.equals("Not Installed")) {
+		if(sortByName.equals("Past 4 Weeks")) {
 			values = null;
-			fields =  new String[] {"Date", "User", "Product", "Account No.", "Address", "Defective", "Notes", "Log No."};
-			titleLabel.setText("Check Out(-) Item Log");
-			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-				s = conn.createStatement();
-				// get table size
-		        String sqlStatement = "SELECT COUNT(co_id) FROM checkout WHERE address IS NULL OR address = '';";
-		        r = s.executeQuery(sqlStatement);
-		        while(r.next()) {
-		        	length = Integer.parseInt(r.getString(1));
-		        }
-		        values = new String[length][fields.length];
-		        s = conn.createStatement();
-		        sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, acc_id, address, defective, notes, co_id FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id) WHERE address IS NULL OR address = '' ORDER BY co_date DESC, product.p_name ASC;";
-		        r = s.executeQuery(sqlStatement);
-		        while(r.next()) {
-		        	for(int i = 0; i < fields.length; i++) {
-		        		if(fields[i].equals("Defective")) {
-		        			if(r.getString(i + 1).equals("0")) {
-		        				values[count][i] = "No";
-		        			}
-		        			else {
-		        				values[count][i] = "Yes";
-		        			}
-		        		}
-		        		else{
-		        			values[count][i] = r.getString(i + 1);
-		        		}
-		        	}
-		        	count++;
-		        }
+			if(checkOutRB.isSelected()) {
+				fields =  new String[] {"Date", "User", "Product", "Account No.", "Address", "Defective", "Notes", "Log No."};
+				titleLabel.setText("Check Out(-) Item Log");
+				try {	
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+					s = conn.createStatement();
+					// get table size
+			        String sqlStatement = "SELECT COUNT(co_id) FROM checkout WHERE co_date > DATEADD(day, -28, GETDATE());";
+			        r = s.executeQuery(sqlStatement);
+			        while(r.next()) {
+			        	length = Integer.parseInt(r.getString(1));
+			        }
+			        values = new String[length][fields.length];
+			        s = conn.createStatement();
+			        sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, acc_id, address, defective, notes, co_id FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id) WHERE co_date > DATEADD(day, -28, GETDATE()) ORDER BY co_date DESC, e_name ASC, product.p_name ASC;";
+			        r = s.executeQuery(sqlStatement);
+			        while(r.next()) {
+			        	for(int i = 0; i < fields.length; i++) {
+			        		if(fields[i].equals("Defective")) {
+			        			if(r.getString(i + 1).equals("0")) {
+			        				values[count][i] = "No";
+			        			}
+			        			else {
+			        				values[count][i] = "Yes";
+			        			}
+			        		}
+			        		else{
+			        			values[count][i] = r.getString(i + 1);
+			        		}
+			        	}
+			        	count++;
+			        }
+				}
+				catch(SQLException e) {
+			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+				}
+		 		finally {
+					try { s.close(); } catch (Exception e) { /* ignored */ }
+					try { r.close(); } catch (Exception e) { /* ignored */ }
+					try { conn.close(); } catch (Exception e) { /* ignored */ }
+				}
 			}
-			catch(SQLException e) {
-		    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
-			}
-	 		finally {
-				try { s.close(); } catch (Exception e) { /* ignored */ }
-				try { r.close(); } catch (Exception e) { /* ignored */ }
-				try { conn.close(); } catch (Exception e) { /* ignored */ }
+			else {
+				fields =  new String[] {"Date", "User", "Product", "Quantity", "Account No.", "Address", "Returned", "Notes", "Log No."};
+				titleLabel.setText("Receive(+) Item Log");
+				try {	
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+					s = conn.createStatement();
+					// get table size
+			        String sqlStatement = "SELECT COUNT(rc_id) FROM receive WHERE rc_date > DATEADD(day, -28, GETDATE());";
+			        r = s.executeQuery(sqlStatement);
+			        while(r.next()) {
+			        	length = Integer.parseInt(r.getString(1));
+			        }
+			        values = new String[length][fields.length];
+			        s = conn.createStatement();
+			        sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE rc_date > DATEADD(day, -28, GETDATE()) ORDER BY rc_date DESC, e_name ASC, product.p_name ASC;";
+			        r = s.executeQuery(sqlStatement);
+			        while(r.next()) {
+			        	for(int i = 0; i < fields.length; i++) {
+			        		if(fields[i].equals("Defective")) {
+			        			if(r.getString(i + 1).equals("0")) {
+			        				values[count][i] = "No";
+			        			}
+			        			else {
+			        				values[count][i] = "Yes";
+			        			}
+			        		}
+			        		else{
+			        			values[count][i] = r.getString(i + 1);
+			        		}
+			        	}
+			        	count++;
+			        }
+				}
+				catch(SQLException e) {
+			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+				}
+		 		finally {
+					try { s.close(); } catch (Exception e) { /* ignored */ }
+					try { r.close(); } catch (Exception e) { /* ignored */ }
+					try { conn.close(); } catch (Exception e) { /* ignored */ }
+				}
 			}
 		}
 		else if(sortByName.equals("Date")) {
@@ -2574,7 +2597,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				fields =  new String[] {"Date", "User", "Product", "Account No.", "Address", "Defective", "Notes", "Log No."};
 				titleLabel.setText("Check Out(-) Item Log");
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 					// get table size
 			        String sqlStatement = "SELECT COUNT(co_id) FROM checkout;";
@@ -2595,13 +2618,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        values = new String[length][fields.length];
 				        s = conn.createStatement();
 				        if(dateOption.equals("Year")) {
-				        	sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, acc_id, address, defective, notes, co_id FROM checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id WHERE YEAR(co_date) = " + year + " ORDER BY co_date DESC, product.p_name ASC;";
+				        	sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, acc_id, address, defective, notes, co_id FROM checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id WHERE YEAR(co_date) = " + year + " ORDER BY co_date DESC, e_name ASC, product.p_name ASC;";
 				        }
 				        else if(dateOption.equals("Month")) {
-				        	sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, acc_id, address, defective, notes, co_id FROM checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id WHERE YEAR(co_date) = " + year + " AND MONTH(co_date) = " + month + " ORDER BY co_date DESC, product.p_name ASC;";
+				        	sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, acc_id, address, defective, notes, co_id FROM checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id WHERE YEAR(co_date) = " + year + " AND MONTH(co_date) = " + month + " ORDER BY co_date DESC, e_name ASC, product.p_name ASC;";
 				        }
 				        else {
-				        	sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, acc_id, address, defective, notes, co_id FROM checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id WHERE YEAR(co_date) = " + year + " AND MONTH(co_date) = " + month + " AND DAY(co_date) = " + day + " ORDER BY co_date DESC, product.p_name ASC;";
+				        	sqlStatement = "SELECT co_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, acc_id, address, defective, notes, co_id FROM checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id WHERE YEAR(co_date) = " + year + " AND MONTH(co_date) = " + month + " AND DAY(co_date) = " + day + " ORDER BY co_date DESC, e_name ASC, product.p_name ASC;";
 				        }
 				        r = s.executeQuery(sqlStatement);
 				        while(r.next()) {
@@ -2623,7 +2646,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			        }
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2635,7 +2658,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				fields =  new String[] {"Date", "User", "Product", "Quantity", "Account No.", "Address", "Returned", "Notes", "Log No."};
 				titleLabel.setText("Receive(+) Item Log");
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 					// get table size
 			        String sqlStatement = "SELECT COUNT(rc_id) FROM receive;";
@@ -2656,13 +2679,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        values = new String[length][fields.length];
 				        s = conn.createStatement();
 				        if(dateOption.equals("Year")) {
-				        	sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE YEAR(rc_date) = " + year + " ORDER BY rc_date DESC, product.p_name ASC;";
+				        	sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE YEAR(rc_date) = " + year + " ORDER BY rc_date DESC, e_name ASC, product.p_name ASC;";
 				        }
 				        else if(dateOption.equals("Month")) {
-				        	sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE YEAR(rc_date) = " + year + " AND MONTH(rc_date) = " + month + " ORDER BY rc_date DESC, product.p_name ASC;";
+				        	sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE YEAR(rc_date) = " + year + " AND MONTH(rc_date) = " + month + " ORDER BY rc_date DESC, e_name ASC, product.p_name ASC;";
 				        }
 				        else {
-				        	sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname), product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE YEAR(rc_date) = " + year + " AND MONTH(rc_date) = " + month + " AND DAY(rc_date) = " + day + " ORDER BY rc_date DESC, product.p_name ASC;";
+				        	sqlStatement = "SELECT rc_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id WHERE YEAR(rc_date) = " + year + " AND MONTH(rc_date) = " + month + " AND DAY(rc_date) = " + day + " ORDER BY rc_date DESC, e_name ASC, product.p_name ASC;";
 				        }
 				        r = s.executeQuery(sqlStatement);
 				        while(r.next()) {
@@ -2684,7 +2707,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			        }
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 				}
 		 		finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2702,7 +2725,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					String[] userParts = new String[2];
 					userParts = user.split("\\s+");
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 						// get table size
 				        String sqlStatement = "SELECT COUNT(co_id) FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
@@ -2712,7 +2735,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 				        values = new String[length][fields.length];
 				        s = conn.createStatement();
-				        sqlStatement = "SELECT (employee.e_fname + ' ' + employee.e_lname), co_date, product.p_name, acc_id, address, defective, notes, co_id FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "' ORDER BY co_date DESC, product.p_name ASC;";
+				        sqlStatement = "SELECT (employee.e_fname + ' ' + employee.e_lname) AS e_name, co_date, product.p_name, acc_id, address, defective, notes, co_id FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "' ORDER BY co_date DESC, e_name ASC, product.p_name ASC;";
 				        r = s.executeQuery(sqlStatement);
 				        while(r.next()) {
 				        	for(int i = 0; i < fields.length; i++) {
@@ -2732,7 +2755,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2748,7 +2771,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					String[] userParts = new String[2];
 					userParts = user.split("\\s+");
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 						// get table size
 				        String sqlStatement = "SELECT COUNT(rc_id) FROM (receive LEFT JOIN employee ON receive.e_id = employee.e_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
@@ -2758,7 +2781,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 				        values = new String[length][fields.length];
 				        s = conn.createStatement();
-				        sqlStatement = "SELECT (employee.e_fname + ' ' + employee.e_lname), rc_date, product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM (receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "' ORDER BY rc_date DESC, product.p_name ASC;";
+				        sqlStatement = "SELECT (employee.e_fname + ' ' + employee.e_lname) AS e_name, rc_date, product.p_name, quantity, acc_id, address, returned, notes, rc_id FROM (receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "' ORDER BY rc_date DESC, e_name ASC, product.p_name ASC;";
 				        r = s.executeQuery(sqlStatement);
 				        while(r.next()) {
 				        	for(int i = 0; i < fields.length; i++) {
@@ -2778,7 +2801,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2795,7 +2818,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				titleLabel.setText("Check Out(-) Item Log");
 				if(barcodeItem[0] != null) {
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 						// get table size
 				        String sqlStatement = "SELECT COUNT(co_id) FROM checkout WHERE p_id = '" + barcodeItem[0] + "';";
@@ -2805,7 +2828,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 				        values = new String[length][fields.length];
 				        s = conn.createStatement();
-				        sqlStatement = "SELECT product.p_name, co_date, (employee.e_fname + ' ' + employee.e_lname), acc_id, address, defective, notes, co_id FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id) WHERE product.p_id = '" + barcodeItem[0] + "' ORDER BY co_date DESC, product.p_name ASC;";
+				        sqlStatement = "SELECT product.p_name, co_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, acc_id, address, defective, notes, co_id FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id LEFT JOIN product ON checkout.p_id = product.p_id) WHERE product.p_id = '" + barcodeItem[0] + "' ORDER BY co_date DESC, e_name ASC, product.p_name ASC;";
 				        r = s.executeQuery(sqlStatement);
 				        while(r.next()) {
 				        	for(int i = 0; i < fields.length; i++) {
@@ -2825,7 +2848,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2839,7 +2862,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				titleLabel.setText("Receive(+) Item Log");
 				if(barcodeItem[0] != null) {
 					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 						// get table size
 				        String sqlStatement = "SELECT COUNT(rc_id) FROM receive WHERE p_id = '" + barcodeItem[0] + "';";
@@ -2849,7 +2872,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 				        values = new String[length][fields.length];
 				        s = conn.createStatement();
-				        sqlStatement = "SELECT product.p_name, rc_date, (employee.e_fname + ' ' + employee.e_lname), quantity, acc_id, address, returned, notes, rc_id FROM (receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id) WHERE product.p_id = '" + barcodeItem[0] + "' ORDER BY rc_date DESC, product.p_name ASC;";
+				        sqlStatement = "SELECT product.p_name, rc_date, (employee.e_fname + ' ' + employee.e_lname) AS e_name, quantity, acc_id, address, returned, notes, rc_id FROM (receive LEFT JOIN employee ON receive.e_id = employee.e_id LEFT JOIN product ON receive.p_id = product.p_id) WHERE product.p_id = '" + barcodeItem[0] + "' ORDER BY rc_date DESC, e_name ASC, product.p_name ASC;";
 				        r = s.executeQuery(sqlStatement);
 				        while(r.next()) {
 				        	for(int i = 0; i < fields.length; i++) {
@@ -2869,7 +2892,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 					}
 			 		finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -2890,37 +2913,37 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(itemTable.getRowCount() > 0) {
 			itemTable.setRowSelectionInterval(0, 0);
 		}
-		if(sortByName.equals("Not Installed") || sortByName.equals("Date")) {
-			itemTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-			itemTable.getColumnModel().getColumn(1).setPreferredWidth(200);
-			itemTable.getColumnModel().getColumn(2).setPreferredWidth(800);
-			itemTable.getColumnModel().getColumn(3).setPreferredWidth(150);
+		if(sortByName.equals("Past 4 Weeks") || sortByName.equals("Date")) {
+			itemTable.getColumnModel().getColumn(0).setPreferredWidth(screenSize.width/12);
+			itemTable.getColumnModel().getColumn(1).setPreferredWidth(screenSize.width/9);
+			itemTable.getColumnModel().getColumn(2).setPreferredWidth(screenSize.width/2);
+			itemTable.getColumnModel().getColumn(3).setPreferredWidth(screenSize.width/12);
 			
 		}
 		else if(sortByName.equals("User")) {
-			itemTable.getColumnModel().getColumn(0).setPreferredWidth(200);
-			itemTable.getColumnModel().getColumn(1).setPreferredWidth(100);
-			itemTable.getColumnModel().getColumn(2).setPreferredWidth(800);
-			itemTable.getColumnModel().getColumn(3).setPreferredWidth(150);
+			itemTable.getColumnModel().getColumn(0).setPreferredWidth(screenSize.width/9);
+			itemTable.getColumnModel().getColumn(1).setPreferredWidth(screenSize.width/12);
+			itemTable.getColumnModel().getColumn(2).setPreferredWidth(screenSize.width/2);
+			itemTable.getColumnModel().getColumn(3).setPreferredWidth(screenSize.width/12);
 		}
 		else if(sortByName.equals("Product")) {
-			itemTable.getColumnModel().getColumn(0).setPreferredWidth(800);
-			itemTable.getColumnModel().getColumn(1).setPreferredWidth(200);
-			itemTable.getColumnModel().getColumn(2).setPreferredWidth(200);
-			itemTable.getColumnModel().getColumn(3).setPreferredWidth(150);
+			itemTable.getColumnModel().getColumn(0).setPreferredWidth(screenSize.width/2);
+			itemTable.getColumnModel().getColumn(1).setPreferredWidth(screenSize.width/9);
+			itemTable.getColumnModel().getColumn(2).setPreferredWidth(screenSize.width/9);
+			itemTable.getColumnModel().getColumn(3).setPreferredWidth(screenSize.width/12);
 		}
 		if(checkOutRB.isSelected()) {
-			itemTable.getColumnModel().getColumn(4).setPreferredWidth(350);
-			itemTable.getColumnModel().getColumn(5).setPreferredWidth(100);
-			itemTable.getColumnModel().getColumn(6).setPreferredWidth(350);
-			itemTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+			itemTable.getColumnModel().getColumn(4).setPreferredWidth(screenSize.width/5);
+			itemTable.getColumnModel().getColumn(5).setPreferredWidth(screenSize.width/12);
+			itemTable.getColumnModel().getColumn(6).setPreferredWidth(screenSize.width/5);
+			itemTable.getColumnModel().getColumn(7).setPreferredWidth(screenSize.width/19);
 		}
 		else {
-			itemTable.getColumnModel().getColumn(4).setPreferredWidth(150);
-			itemTable.getColumnModel().getColumn(5).setPreferredWidth(350);
-			itemTable.getColumnModel().getColumn(6).setPreferredWidth(100);
-			itemTable.getColumnModel().getColumn(7).setPreferredWidth(350);
-			itemTable.getColumnModel().getColumn(8).setPreferredWidth(100);
+			itemTable.getColumnModel().getColumn(4).setPreferredWidth(screenSize.width/12);
+			itemTable.getColumnModel().getColumn(5).setPreferredWidth(screenSize.width/12);
+			itemTable.getColumnModel().getColumn(6).setPreferredWidth(screenSize.width/19);
+			itemTable.getColumnModel().getColumn(7).setPreferredWidth(screenSize.width/5);
+			itemTable.getColumnModel().getColumn(8).setPreferredWidth(screenSize.width/19);
 		}
 		if(itemTable == null || itemTable.getRowCount() < 1) {
 			editItemLogButton.setVisible(false);
@@ -2947,7 +2970,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		kitName = null;
 		ArrayList<String> kitLines = new ArrayList<String>();
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 			// get table size
 	        String sqlStatement = "SELECT p_name FROM product WHERE kit = '" + 1 + "';";
@@ -2957,7 +2980,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem finding the kits in the database.", "Could not find kits in DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem finding the kits in the database.\n" + e.toString(), "Could not find kits in DB", JOptionPane.WARNING_MESSAGE);
 		}
  		finally {
 			try { s.close(); } catch (Exception e) {  }
@@ -2970,7 +2993,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		kitList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		kitList.setLayoutOrientation(JList.VERTICAL);
 		kitList.setVisibleRowCount(-1);
-		kitList.setFont(new Font("Arial", Font.BOLD, 28));
+		kitList.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		kitList.addMouseListener(this);
 		
 		kitScrollPane = new JScrollPane(kitList);
@@ -2980,7 +3003,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    kitScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		kitPanel = new JPanel();
-		kitPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		kitPanel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		kitPanel.add(kitScrollPane);
 		
 		if(kitList.getModel().getSize() != 0) {
@@ -3016,7 +3039,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		String[] matchedLineEntries = new String[5];
 		
 		try {
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT p_id, p_name, instock, restock, kit FROM product WHERE p_id = '" + barcode + "';";
 	        r = s.executeQuery(sqlStatement);
@@ -3029,7 +3052,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.", "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.\n" + e.toString(), "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
 		}
 		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3054,13 +3077,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 			replacedLine = findItem(itemsOrder.get(i));
 			if(checkOutOrReceive.equals("checkOut")) {
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 			        String sqlStatement = "UPDATE product SET instock= " + (Integer.parseInt(replacedLine[2]) - selectedQuantity) + " WHERE p_id = '" + replacedLine[0] + "';";
 			        s.execute(sqlStatement);
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem subtracting item " + replacedLine[0] + " in the database.", "Could not subtract item into DB", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem subtracting item " + replacedLine[0] + " in the database.\n" + e.toString(), "Could not subtract item into DB", JOptionPane.WARNING_MESSAGE);
 				}
 				finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3072,13 +3095,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			else {
 				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 			        String sqlStatement = "UPDATE product SET instock= " + (Integer.parseInt(replacedLine[2]) + selectedQuantity) + " WHERE p_id = '" + replacedLine[0] + "';";
 			        s.execute(sqlStatement);
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem adding the item " + replacedLine[0] + " into the database.", "Could not add item into DB", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem adding the item " + replacedLine[0] + " into the database.\n" + e.toString(), "Could not add item into DB", JOptionPane.WARNING_MESSAGE);
 				}
 				finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3090,8 +3113,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 		}
 		updateRestockingNumber();
 		if(namesList.size() != 0) {
-			JOptionPane.showMessageDialog(program, "Successfully updated items!", "Update complete", JOptionPane.PLAIN_MESSAGE);
 			barcodeTextField.requestFocusInWindow();
+	    	JOptionPane.showMessageDialog(program, "Successfully updated items!", "Item Update Complete", JOptionPane.INFORMATION_MESSAGE);
 		}
 			
 		itemsTextArea.setText("Quantity\tIn Stock\tItem\n");
@@ -3109,14 +3132,14 @@ public class InventoryApp extends JFrame implements MouseListener{
 		if(operator.equals("sub")) {
 			try {	
 				for(int i = 0; i < quantity; i++) {
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 			        String sqlStatement = "INSERT INTO checkout (co_date, e_id, p_id, address) SELECT '" + dtfSQL.format(LocalDateTime.now()) + "', e_id, '" + itemBarcode + "', NULL FROM employee WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
 			        s.execute(sqlStatement);
 				}
 			}
 			catch(SQLException e) {
-		    	JOptionPane.showMessageDialog(program, "There is a problem subtracting the amount from the database.", "Could not subtract stock from DB", JOptionPane.WARNING_MESSAGE);
+		    	JOptionPane.showMessageDialog(program, "There is a problem subtracting the amount from the database.\n" + e.toString(), "Could not subtract stock from DB", JOptionPane.WARNING_MESSAGE);
 			}
 			finally {
 				try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3127,13 +3150,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 		else if(operator.equals("add")) {
 			if(quantity != 0) {
 				try {	
-				    conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				    conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 					s = conn.createStatement();
 				    String sqlStatement = "INSERT INTO receive (rc_date, e_id, p_id, quantity) SELECT '" + dtfSQL.format(LocalDateTime.now()) + "', e_id, '" + itemBarcode + "', " + quantity + " FROM employee WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "';";
 				    s.execute(sqlStatement);
 				}
 				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem adding the amount to the database.", "Could not add stock to DB", JOptionPane.WARNING_MESSAGE);
+			    	JOptionPane.showMessageDialog(program, "There is a problem adding the amount to the database.\n" + e.toString(), "Could not add stock to DB", JOptionPane.WARNING_MESSAGE);
 				}
 				finally {
 					try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3158,7 +3181,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		restockingNumber = 0;
  		
  		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT COUNT(p_id) FROM product WHERE instock < restock;";
 	        r = s.executeQuery(sqlStatement);
@@ -3167,7 +3190,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem determining the restocking numbers from the database.", "Could not determine restock numbers", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem determining the restocking numbers from the database.\n" + e.toString(), "Could not determine restock numbers", JOptionPane.WARNING_MESSAGE);
 		}
  		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3193,7 +3216,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		String itemsFormatted = "Restock Inventory List: Created on " + dtf.format(LocalDateTime.now()) + "\n\nIn Stock\tItem\n";
 		String currentItemName = "";
  		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT instock, p_name FROM product WHERE instock < restock ORDER BY p_name;";
 	        r = s.executeQuery(sqlStatement);
@@ -3206,7 +3229,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.", "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.\n" + e.toString(), "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
 		}
  		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3222,7 +3245,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			bw.close();
 		}
 		catch(IOException e){
-			JOptionPane.showMessageDialog(program, "Could not write to the restocking file.", "Problem writing to file", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(program, "Could not write to the restocking file.\n" + e.toString(), "Problem writing to file", JOptionPane.WARNING_MESSAGE);
 		}
  		itemsTextArea.setText(itemsFormatted);
 	}
@@ -3230,372 +3253,82 @@ public class InventoryApp extends JFrame implements MouseListener{
 		itemsTextArea.setText("");
 		String itemsFormatted = "";
 		int totalItems = 0;
-		int defectiveItems = 0, returnedItems = 0;
 		String currentItemName = "";
-		if(reportType.equals("Date")) {
-			itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nReport for " + LocalDateTime.now().getYear() + "\n\n";
-			if(dateOption.equals("Month")) {	
-				for(int i = 0; i < 12; i++) {
-					totalItems = 0;
-					defectiveItems = 0;
-					
-					// get check out list
-					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-						s = conn.createStatement();
-				        String sqlStatement = "SELECT COUNT(co_id) as c, product.p_name FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id) WHERE MONTH(co_date) = " + (i + 1) + "AND YEAR(co_date) = " + year + " GROUP BY product.p_name ORDER BY c DESC;";
-				        r = s.executeQuery(sqlStatement);
-				        if(r.isBeforeFirst()) {
-				        	itemsFormatted += months[i] + " Check Out:\n\nQuantity\tItem\n";
-						}
-					    while(r.next()) {
-					    	currentItemName = r.getString(2);
-				        	if(currentItemName.length() > 70) {
-								currentItemName = currentItemName.substring(0,70) + "...";
-							}
-					    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-					    	totalItems += Integer.parseInt(r.getString(1));
-					    }
-					    if(totalItems != 0) {
-					    	itemsFormatted += "\nTotal Check Out: " + totalItems + "\n\n";
-					    }
-					}
-					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
-				    	e.printStackTrace();
-					}
-			 		finally {
-						try { s.close(); } catch (Exception e) { /* ignored */ }
-						try { r.close(); } catch (Exception e) { /* ignored */ }
-						try { conn.close(); } catch (Exception e) { /* ignored */ }
-					}
-					
-					// get defective list
-					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-						s = conn.createStatement();
-				        String sqlStatement = "SELECT COUNT(co_id) as c, product.p_name FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id) WHERE MONTH(co_date) = " + (i + 1) + "AND YEAR(co_date) = " + year + " AND defective = 1 GROUP BY product.p_name ORDER BY c DESC;";
-				        r = s.executeQuery(sqlStatement);
-				        if(r.isBeforeFirst()) {
-				        	itemsFormatted += months[i] + " Defective:\n\nQuantity\tItem\n";
-						}
-					    while(r.next()) {
-					    	currentItemName = r.getString(2);
-				        	if(currentItemName.length() > 70) {
-								currentItemName = currentItemName.substring(0,70) + "...";
-							}
-					    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-					    	defectiveItems += Integer.parseInt(r.getString(1));
-					    }
-					    if(defectiveItems != 0) {
-					    	itemsFormatted += "\nTotal Defective: " + defectiveItems + "\n\n";
-					    }
-					}
-					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding defective item logs for reports.", "Could not find defective item logs in DB", JOptionPane.WARNING_MESSAGE);
-				    	e.printStackTrace();
-					}
-			 		finally {
-						try { s.close(); } catch (Exception e) { /* ignored */ }
-						try { r.close(); } catch (Exception e) { /* ignored */ }
-						try { conn.close(); } catch (Exception e) { /* ignored */ }
-					}
-					
-					totalItems = 0;
-					returnedItems = 0;
-					
-					// get receive list
-					try {	
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-						s = conn.createStatement();
-				        String sqlStatement = "SELECT SUM(quantity) as c, product.p_name FROM (receive LEFT JOIN product ON receive.p_id = product.p_id) WHERE MONTH(rc_date) = " + (i + 1) + "AND YEAR(rc_date) = " + year + " GROUP BY product.p_name ORDER BY c DESC;";
-				        r = s.executeQuery(sqlStatement);
-				        if(r.isBeforeFirst()) {
-				        	itemsFormatted += months[i] + " Receive:\n\nQuantity\tItem\n";
-						}
-				        while(r.next()) {
-					    	currentItemName = r.getString(2);
-				        	if(currentItemName.length() > 70) {
-								currentItemName = currentItemName.substring(0,70) + "...";
-							}
-					    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-					    	totalItems += Integer.parseInt(r.getString(1));
-					    }
-					    if(totalItems != 0) {
-					    	itemsFormatted += "\nTotal Receive: " + totalItems + "\n\n";
-					    }
-					}
-					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding receive item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
-				    	e.printStackTrace();
-					}
-			 		finally {
-						try { s.close(); } catch (Exception e) { /* ignored */ }
-						try { r.close(); } catch (Exception e) { /* ignored */ }
-						try { conn.close(); } catch (Exception e) { /* ignored */ }
-					}
-					
-					// get returned list
-					try {	
-						conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-						s = conn.createStatement();
-				        String sqlStatement = "SELECT SUM(quantity) as c, product.p_name FROM (receive LEFT JOIN product ON receive.p_id = product.p_id) WHERE MONTH(rc_date) = " + (i + 1) + "AND YEAR(rc_date) = " + year + " AND returned = 1 GROUP BY product.p_name ORDER BY c DESC;";
-				        r = s.executeQuery(sqlStatement);
-				        if(r.isBeforeFirst()) {
-				        	itemsFormatted += months[i] + " Returned:\n\nQuantity\tItem\n";
-						}
-				        while(r.next()) {
-					    	currentItemName = r.getString(2);
-				        	if(currentItemName.length() > 70) {
-								currentItemName = currentItemName.substring(0,70) + "...";
-							}
-					    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-					    	returnedItems += Integer.parseInt(r.getString(1));
-					    }
-					    if(returnedItems != 0) {
-					    	itemsFormatted += "\nTotal Returned: " + returnedItems + "\n\n";
-					    }
-					}
-					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding returned item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
-				    	e.printStackTrace();
-					}
-			 		finally {
-						try { s.close(); } catch (Exception e) { /* ignored */ }
-						try { r.close(); } catch (Exception e) { /* ignored */ }
-						try { conn.close(); } catch (Exception e) { /* ignored */ }
-					}
-					
-				}
+		if(reportType.equals("Usage")) {
+			totalItems = 0;
+			if(dateOption.equals("Year")) {
+				itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nUsage Report for " + year  + "\n\n";
 			}
-			else if(dateOption.equals("Year")) {
-				totalItems = 0;
-				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT COUNT(co_id) as c, product.p_name FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id) WHERE YEAR(co_date) = " + year + " GROUP BY product.p_name ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        	itemsFormatted += "Check Out\n\nQuantity\tItem\n";
-				    while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	totalItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(r.isAfterLast()) {
-				    	itemsFormatted += "\nTotal Check Out: " + totalItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
-			    	e.printStackTrace();
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
-				
-				defectiveItems = 0;
-				
-				// get defective list
-				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT COUNT(co_id) as c, product.p_name FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id) WHERE YEAR(co_date) = " + year + " AND defective = 1 GROUP BY product.p_name ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        if(r.isBeforeFirst()) {
-			        	itemsFormatted += "Defective:\n\nQuantity\tItem\n";
-					}
-				    while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	defectiveItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(defectiveItems != 0) {
-				    	itemsFormatted += "\nTotal Defective: " + defectiveItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding defective item logs for reports.", "Could not find defective item logs in DB", JOptionPane.WARNING_MESSAGE);
-			    	e.printStackTrace();
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
-				
-				totalItems = 0;
-				returnedItems = 0;
-				
-				totalItems = 0;
-				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT SUM(quantity) as c, product.p_name FROM (receive LEFT JOIN product ON receive.p_id = product.p_id) WHERE YEAR(rc_date) = " + year + " GROUP BY product.p_name ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        if(r.isBeforeFirst()) {
-			        	itemsFormatted += "Receive\n\nQuantity\tItem\n";
-					}
-				    while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	totalItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(r.isAfterLast()) {
-				    	itemsFormatted += "\nTotal Receive: " + totalItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding receive item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
-			    	e.printStackTrace();
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
-				
-				// get returned list
-				try {	
-					conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT SUM(quantity) as c, product.p_name FROM (receive LEFT JOIN product ON receive.p_id = product.p_id) WHERE YEAR(rc_date) = " + year + " AND returned = 1 GROUP BY product.p_name ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        if(r.isBeforeFirst()) {
-			        	itemsFormatted += "Returned:\n\nQuantity\tItem\n";
-					}
-			        while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	returnedItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(returnedItems != 0) {
-				    	itemsFormatted += "\nTotal Returned: " + returnedItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding returned item logs for reports.", "Could not find receive item logs in DB", JOptionPane.WARNING_MESSAGE);
-			    	e.printStackTrace();
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
+			else if(dateOption.equals("Month")) {
+				itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nUsage Report for " + months[month - 1] + " " + year  + "\n\n";
 			}
+			else if(dateOption.equals("Day")) {
+				itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nUsage Report for " + months[month - 1] + " " + day + " " + year  + "\n\n";
+			}
+			try {	
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+				s = conn.createStatement();
+				String sqlStatement = "";
+				if(dateOption.equals("Year")) {
+		        	sqlStatement = "SELECT COUNT(co_id), p_name, employee.e_fname FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE YEAR(checkout.co_date) = " + year + " GROUP BY p_name, employee.e_fname;";
+				}
+				else if(dateOption.equals("Month")) {
+			        sqlStatement = "SELECT COUNT(co_id), p_name, employee.e_fname FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE MONTH(checkout.co_date) = " + month + " AND YEAR(checkout.co_date) = " + year + " GROUP BY p_name, employee.e_fname;";
+
+				}
+				else if(dateOption.equals("Day")) {
+			        sqlStatement = "SELECT COUNT(co_id), p_name, employee.e_fname FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE DAY(checkout.co_date) = " + day + "AND MONTH(checkout.co_date) = " + month + " AND YEAR(checkout.co_date) = " + year + " GROUP BY p_name, employee.e_fname;";
+				}
+		        r = s.executeQuery(sqlStatement);
+			    while(r.next()) {
+			    	currentItemName = r.getString(2);
+		        	if(currentItemName.length() > 80) {
+						currentItemName = currentItemName.substring(0,80) + "...";
+					}
+			    	itemsFormatted += r.getString(1) + "\t" + r.getString(3) + "\t" + currentItemName + "\n";
+			    	totalItems += Integer.parseInt(r.getString(1));
+			    }
+			    if(totalItems != 0) {
+			    	itemsFormatted += "\nTotal Check Out: " + totalItems + "\n\n";
+			    }
+			}
+			catch(SQLException e) {
+		    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.\n" + e.toString(), "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
+			}
+	 		finally {
+				try { s.close(); } catch (Exception e) { /* ignored */ }
+				try { r.close(); } catch (Exception e) { /* ignored */ }
+				try { conn.close(); } catch (Exception e) { /* ignored */ }
+			}
+			
 		}
-		else if(reportType.equals("User")) {
-			if(user != null) {	
-				itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nReport for " + user + ", " + year + "\n\n";
-				String[] userParts = new String[2];
-				userParts = user.split("\\s+");
-				totalItems = 0;
-				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT COUNT(co_id) as c, product.p_name FROM (checkout LEFT JOIN product ON checkout.p_id = product.p_id LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE e_lname = '" + userParts[1] + "' AND e_fname = '" + userParts[0] + "' AND (address IS NULL OR address = '') GROUP BY product.p_name ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        if(r.isBeforeFirst()) {
-			        	itemsFormatted += "Not Installed:\n\nQuantity\tItem\n";
+		else if(reportType.equals("Snapshot")) {
+			itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nSnapshot Report for beginning of " + months[month - 1] + " " + day + " " + year + "\n\n";
+			try {	
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
+				s = conn.createStatement();
+				// gets the snapshot of inventory by reversing the changes done to it
+		        String sqlStatement = 	"SELECT a.p_name, SUM(a.total) FROM " + 
+		        							"((SELECT p_name, SUM(instock) total FROM ((SELECT p_id, p_name, instock FROM product) UNION ALL (SELECT edited.p_id, p_name, quantity * -1 as instock FROM (edited LEFT JOIN product on edited.p_id = product.p_id) WHERE edit_date BETWEEN '" + month + "-" + day + "-" + year + "' AND '" + dtfSQL.format(LocalDateTime.now()) + "')) t GROUP BY p_name) UNION ALL " + 
+		        							"(SELECT p_name, SUM(1) total FROM (product LEFT JOIN checkout ON product.p_id = checkout.p_id) WHERE checkout.co_date BETWEEN '" + month + "-" + day + "-" + year + "' AND '" + dtfSQL.format(LocalDateTime.now()) + "' GROUP BY p_name) UNION ALL " + 
+		        							"(SELECT p_name, SUM(quantity * -1) total FROM (product LEFT JOIN receive ON product.p_id = receive.p_id) WHERE receive.rc_date BETWEEN '" + month + "-" + day + "-" + year + "' AND '" + dtfSQL.format(LocalDateTime.now()) + "' GROUP BY p_name)) AS a " + 
+		        						"GROUP BY a.p_name;";
+		        r = s.executeQuery(sqlStatement);
+			    while(r.next()) {
+			    	currentItemName = r.getString(1);
+		        	if(currentItemName.length() > 70) {
+						currentItemName = currentItemName.substring(0,70) + "...";
 					}
-				    while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	totalItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(r.isAfterLast()) {
-				    	itemsFormatted += "\nTotal Not Installed: " + totalItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
-			    	e.printStackTrace();
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
+			    	itemsFormatted += r.getString(2) + "\t" + currentItemName + "\n";
+			    }
 			}
-		}
-		else if(reportType.equals("Product")) {
-			if(barcodeItem[0] != null) {	
-				itemsFormatted = "Reports : Created on " + dtf.format(LocalDateTime.now()) + "\n\nReport for " + barcodeItem[1] + ", " + year + "\n\n";
-				totalItems = 0;
-				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT COUNT(co_id) as c, (e_fname + ' ' + e_lname) FROM (checkout LEFT JOIN employee ON checkout.e_id = employee.e_id) WHERE YEAR(co_date) = " + year + " AND checkout.p_id = '" + barcodeItem[0] + "' GROUP BY (e_fname + ' ' + e_lname) ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        if(r.isBeforeFirst()) {
-			        	itemsFormatted += "Check Out(-):\n\nQuantity\tUser\n";
-					}
-				    while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	totalItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(r.isAfterLast()) {
-				    	itemsFormatted += "\nTotal Check Out(-): " + totalItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-					e.printStackTrace();
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding check out item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
-				try {	
-			        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
-					s = conn.createStatement();
-			        String sqlStatement = "SELECT SUM(quantity) as c, (e_fname + ' ' + e_lname) FROM (receive LEFT JOIN employee ON receive.e_id = employee.e_id) WHERE YEAR(rc_date) = " + year + " AND receive.p_id = '" + barcodeItem[0] + "' GROUP BY (e_fname + ' ' + e_lname) ORDER BY c DESC;";
-			        r = s.executeQuery(sqlStatement);
-			        if(r.isBeforeFirst()) {
-			        	itemsFormatted += "Receive(+):\n\nQuantity\tUser\n";
-					}
-				    while(r.next()) {
-				    	currentItemName = r.getString(2);
-			        	if(currentItemName.length() > 70) {
-							currentItemName = currentItemName.substring(0,70) + "...";
-						}
-				    	itemsFormatted += r.getString(1) + "\t" + currentItemName + "\n";
-				    	totalItems += Integer.parseInt(r.getString(1));
-				    }
-				    if(r.isAfterLast()) {
-				    	itemsFormatted += "\nTotal Receive(+): " + totalItems + "\n\n";
-				    }
-				}
-				catch(SQLException e) {
-					e.printStackTrace();
-			    	JOptionPane.showMessageDialog(program, "There is a problem finding receive item logs for reports.", "Could not find check out item logs in DB", JOptionPane.WARNING_MESSAGE);
-				}
-		 		finally {
-					try { s.close(); } catch (Exception e) { /* ignored */ }
-					try { r.close(); } catch (Exception e) { /* ignored */ }
-					try { conn.close(); } catch (Exception e) { /* ignored */ }
-				}
+			catch(SQLException e) {
+		    	JOptionPane.showMessageDialog(program, "There is a problem finding item quantities for reports.\n" + e.toString(), "Could not find item information from DB", JOptionPane.WARNING_MESSAGE);
+			}
+	 		finally {
+				try { s.close(); } catch (Exception e) { /* ignored */ }
+				try { r.close(); } catch (Exception e) { /* ignored */ }
+				try { conn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
 		try {
@@ -3607,7 +3340,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			bw.close();
 		}
 		catch(IOException e){
-			JOptionPane.showMessageDialog(program, "Could not write to the reports file.", "Problem writing to file", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(program, "Could not write to the reports file.\n" + e.toString(), "Problem writing to file", JOptionPane.WARNING_MESSAGE);
 		}
 		itemsTextArea.setText(itemsFormatted);
 	}
@@ -3629,16 +3362,26 @@ public class InventoryApp extends JFrame implements MouseListener{
 		return itemsFormatted;
 	}
 	
-	public String createSearchTermsString(String searchTerms) {
+	public String createSearchTermsString(String searchTerms, String tName) {
 		String[] itemSearchInputParts = searchTerms.split("\\s+");
-		String searchTermsString = "(p_name LIKE '%";
-		
+		String searchTermsString = "";
+		if(!tName.equals("")) {
+			searchTermsString = "(" + tName + ".p_name LIKE '%";
+		}
+		else {
+			searchTermsString = "(p_name LIKE '%";
+		}
 		for(int i = 0; i < itemSearchInputParts.length; i++) {
 			if(i == itemSearchInputParts.length - 1) {
 				searchTermsString += itemSearchInputParts[i];
 			}
 			else {
-				searchTermsString += itemSearchInputParts[i] + "%' AND p_name LIKE '%";
+				if(!tName.equals("")) {
+					searchTermsString += itemSearchInputParts[i] + "%' AND " + tName + ".p_name LIKE '%";
+				}
+				else {
+					searchTermsString += itemSearchInputParts[i] + "%' AND p_name LIKE '%";
+				}
 			}
 		}
 		searchTermsString += "%')";
@@ -3653,7 +3396,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		values = null;
 		fields =  new String[] {"Quantity", "Kit Item", "Kit Item ID"};
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 			// get table size
 	        String sqlStatement = "SELECT COUNT(kitItem_id) FROM (kitItem LEFT JOIN product p1 ON kitItem.kitItem_product = p1.p_id) LEFT JOIN product ON kitItem.kit_product = product.p_id WHERE product.p_name = '" + kitName +"';";
@@ -3675,7 +3418,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit items in the database.", "Could not find kit items in DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit items in the database.\n" + e.toString(), "Could not find kit items in DB", JOptionPane.WARNING_MESSAGE);
 		}
  		finally {
 			try { s.close(); } catch (Exception e) {    }
@@ -3691,8 +3434,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 		};
 		
 		kitItemTable.setModel(newTableModel);
-		kitItemTable.getColumnModel().getColumn(0).setPreferredWidth(150);
-		kitItemTable.getColumnModel().getColumn(1).setPreferredWidth(700);
+		kitItemTable.getColumnModel().getColumn(0).setPreferredWidth(screenSize.width/12);
+		kitItemTable.getColumnModel().getColumn(1).setPreferredWidth(screenSize.width/3);
 
 		if(kitItemTable.getRowCount() > 0) {
 			kitItemTable.setRowSelectionInterval(0, 0);
@@ -3701,8 +3444,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 	}
 	public void refreshItemTable() {
 		String itemSearchInput = itemSearchTextField.getText().trim();
-		String searchTermsString = createSearchTermsString(itemSearchInput);
-		
     	String[] fields;
 		String[][] values;
 		DefaultTableModel newTableModel;
@@ -3711,10 +3452,11 @@ public class InventoryApp extends JFrame implements MouseListener{
 		values = null;
 		fields =  new String[] {"Name", "Barcode", "In Stock", "Restock", "Kit"};
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 			// get table size
-	        String sqlStatement = "SELECT COUNT(p_id) FROM product WHERE " + searchTermsString + " OR p_id = '" + itemSearchInput + "';";
+	        String sqlStatement = 	"SELECT COUNT(*) FROM (SELECT p_name, p_id, instock, restock, kit FROM product WHERE " + createSearchTermsString(itemSearchInput, "") + " OR p_id = '" + itemSearchInput + "' UNION " + 
+	        			        	"SELECT p2.p_name, p2.p_id, p2.instock, p2.restock, p2.kit FROM ((product p1 LEFT JOIN kitItem ON kit_product = p1.p_id) LEFT JOIN product p2 ON kitItem_product = p2.p_id) WHERE (p2.p_id = kitItem.kitItem_product AND " + createSearchTermsString(itemSearchInput, "p1") + ")) t;";
 	        r = s.executeQuery(sqlStatement);
 	        while(r.next()) {
 	        	length = Integer.parseInt(r.getString(1));
@@ -3727,7 +3469,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 	        values = new String[length][fields.length];
 	        s = conn.createStatement();
-	        sqlStatement = "SELECT p_name, p_id, instock, restock, kit FROM product WHERE " + searchTermsString + " OR p_id = '" + itemSearchInput + "' ORDER BY p_name ASC;";
+	        sqlStatement = 			"SELECT p_name, p_id, instock, restock, kit FROM product WHERE " + createSearchTermsString(itemSearchInput, "") + " OR p_id = '" + itemSearchInput + "' UNION " + 
+	        						"SELECT p2.p_name, p2.p_id, p2.instock, p2.restock, p2.kit FROM ((product p1 LEFT JOIN kitItem ON kit_product = p1.p_id) LEFT JOIN product p2 ON kitItem_product = p2.p_id) WHERE (p2.p_id = kitItem.kitItem_product AND " + createSearchTermsString(itemSearchInput, "p1") + ");";
 	        r = s.executeQuery(sqlStatement);
 	        while(r.next()) {
 	        	for(int i = 0; i < fields.length; i++) {
@@ -3747,7 +3490,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.", "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem finding the items in the database.\n" + e.toString(), "Could not find items in DB", JOptionPane.WARNING_MESSAGE);
 		}
  		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -3762,17 +3505,15 @@ public class InventoryApp extends JFrame implements MouseListener{
 		};
 		dtm = newTableModel;
 		itemTable.setModel(dtm);
-		itemTable.getColumnModel().getColumn(0).setPreferredWidth(1000);
-		itemTable.getColumnModel().getColumn(1).setPreferredWidth(300);
-		itemTable.getColumnModel().getColumn(2).setPreferredWidth(150);
-		itemTable.getColumnModel().getColumn(3).setPreferredWidth(150);
-		itemTable.getColumnModel().getColumn(4).setPreferredWidth(100);
+		itemTable.getColumnModel().getColumn(0).setPreferredWidth(screenSize.width/2);
+		itemTable.getColumnModel().getColumn(1).setPreferredWidth(screenSize.width/6);
+		itemTable.getColumnModel().getColumn(2).setPreferredWidth(screenSize.width/12);
+		itemTable.getColumnModel().getColumn(3).setPreferredWidth(screenSize.width/12);
+		itemTable.getColumnModel().getColumn(4).setPreferredWidth(screenSize.width/19);
 
 		if(itemTable.getRowCount() > 0) {
 			itemTable.setRowSelectionInterval(0, 0);
 		}
-		itemSearchTextField.setText("");
-		itemSearchTextField.requestFocusInWindow();
 	}
 	
 	@Override
@@ -3812,8 +3553,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 					doneButton.setVisible(false);
 					printButton.setVisible(false);
 					undoButton.setVisible(false);
-					dateReportButton.setVisible(false);
-					userReportButton.setVisible(false);
+					usageReportButton.setVisible(false);
+					snapshotReportButton.setVisible(false);
 					productReportButton.setVisible(false);
 					itemsTextArea.setVisible(false);
 					itemsScrollPane.setVisible(false);
@@ -3843,8 +3584,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 				receiveRB.setVisible(false);
 				doneButton.setVisible(false);
 				printButton.setVisible(false);
-				dateReportButton.setVisible(false);
-				userReportButton.setVisible(false);
+				usageReportButton.setVisible(false);
+				snapshotReportButton.setVisible(false);
 				productReportButton.setVisible(false);
 				itemsTextArea.setVisible(false);
 				itemsScrollPane.setVisible(false);
@@ -3879,15 +3620,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 					doneButton.setVisible(false);
 					printButton.setVisible(true);
 					undoButton.setVisible(false);
-					dateReportButton.setVisible(true);
-					userReportButton.setVisible(true);
-					productReportButton.setVisible(true);
+					usageReportButton.setVisible(true);
+					snapshotReportButton.setVisible(true);
+					// productReportButton.setVisible(true);
 					itemsTextArea.setVisible(true);
 					itemsScrollPane.setVisible(true);
 					itemTableScrollPane.setVisible(false);
-					reportType = "Date";
-					dateOption = "Month";
+					reportType = "Usage";
+					dateOption = "Day";
 					year = LocalDate.now().getYear();
+					month = LocalDate.now().getMonthValue();
+					day = LocalDate.now().getDayOfMonth();
 					updateReports();
 					itemsTextArea.setCaretPosition(0);
 				}
@@ -3913,15 +3656,17 @@ public class InventoryApp extends JFrame implements MouseListener{
 				receiveRB.setVisible(false);
 				doneButton.setVisible(false);
 				printButton.setVisible(true);
-				dateReportButton.setVisible(true);
-				userReportButton.setVisible(true);
-				productReportButton.setVisible(true);
+				usageReportButton.setVisible(true);
+				snapshotReportButton.setVisible(true);
+				//productReportButton.setVisible(true);
 				itemsTextArea.setVisible(true);
 				itemsScrollPane.setVisible(true);
 				itemTableScrollPane.setVisible(false);
-				reportType = "Date";
-				dateOption = "Month";
+				reportType = "Usage";
+				dateOption = "Day";
 				year = LocalDate.now().getYear();
+				month = LocalDate.now().getMonthValue();
+				day = LocalDate.now().getDayOfMonth();
 				updateReports();
 				itemsTextArea.setCaretPosition(0);
 			}
@@ -3953,8 +3698,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 					doneButton.setVisible(false);
 					printButton.setVisible(true);
 					undoButton.setVisible(false);
-					dateReportButton.setVisible(false);
-					userReportButton.setVisible(false);
+					usageReportButton.setVisible(false);
+					snapshotReportButton.setVisible(false);
 					productReportButton.setVisible(false);
 					itemsTextArea.setVisible(true);
 					itemsScrollPane.setVisible(true);
@@ -3984,8 +3729,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 				receiveRB.setVisible(false);
 				doneButton.setVisible(false);
 				printButton.setVisible(true);
-				dateReportButton.setVisible(false);
-				userReportButton.setVisible(false);
+				usageReportButton.setVisible(false);
+				snapshotReportButton.setVisible(false);
 				productReportButton.setVisible(false);
 				itemsTextArea.setVisible(true);
 				itemsScrollPane.setVisible(true);
@@ -4021,8 +3766,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 					doneButton.setVisible(false);
 					printButton.setVisible(false);
 					undoButton.setVisible(false);
-					dateReportButton.setVisible(false);
-					userReportButton.setVisible(false);
+					usageReportButton.setVisible(false);
+					snapshotReportButton.setVisible(false);
 					productReportButton.setVisible(false);
 					itemsTextArea.setVisible(true);
 					itemsScrollPane.setVisible(false);
@@ -4034,8 +3779,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 							dtm.removeRow(0);
 						}
 					}
-					sortByName = "Date";
-					dateOption = "Year";
+					sortByName = "Past 4 Weeks";
 					sortByAndShow();
 				}
 			}
@@ -4060,8 +3804,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 				receiveRB.setVisible(true);
 				doneButton.setVisible(false);
 				printButton.setVisible(false);
-				dateReportButton.setVisible(false);
-				userReportButton.setVisible(false);
+				usageReportButton.setVisible(false);
+				snapshotReportButton.setVisible(false);
 				productReportButton.setVisible(false);
 				itemsTextArea.setVisible(true);
 				itemsScrollPane.setVisible(false);
@@ -4073,8 +3817,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 						dtm.removeRow(0);
 					}
 				}
-				sortByName = "Date";
-				dateOption = "Year";
+				sortByName = "Past 4 Weeks";
 				year = LocalDate.now().getYear();
 				sortByAndShow();
 				if(itemTable == null || itemTable.getRowCount() < 1) {
@@ -4174,8 +3917,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 			receiveRB.setVisible(false);
 			doneButton.setVisible(false);
 			printButton.setVisible(false);
-			dateReportButton.setVisible(false);
-			userReportButton.setVisible(false);
+			usageReportButton.setVisible(false);
+			snapshotReportButton.setVisible(false);
 			productReportButton.setVisible(false);
 			itemsTextArea.setVisible(true);
 			itemsScrollPane.setVisible(false);
@@ -4242,27 +3985,13 @@ public class InventoryApp extends JFrame implements MouseListener{
 					desktop.print(new File("Restock.csv"));
 					JOptionPane.showMessageDialog(program, "Successfully printed restock list!", "Restock list printed", JOptionPane.PLAIN_MESSAGE);
 				}
-				/*
-				else if(titleLabel.getText().equals("Item Log")) {
-					File logFile = new File("Log.csv");
-					if(logFile.length() != 0) {
-						logFile.setWritable(true);
-						desktop.print(logFile);
-						JOptionPane.showMessageDialog(program, "Successfully printed item log!", "Item log printed", JOptionPane.PLAIN_MESSAGE);
-						BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
-						bw.write("");
-						logFile.setWritable(false);
-						bw.close();
-						itemsTextArea.setText("Item Log: " + "\n\n");
-					}
-					else {
-						JOptionPane.showMessageDialog(program, "There is nothing to print in the item log file.", "Could not print item log", JOptionPane.WARNING_MESSAGE);
-					}
+				else if(titleLabel.getText().equals("Reports")) {
+					desktop.print(new File("Reports.csv"));
+					JOptionPane.showMessageDialog(program, "Successfully printed report!", "Report printed", JOptionPane.PLAIN_MESSAGE);
 				}
-				*/
 			}
 			catch(IOException ioe) {
-				JOptionPane.showMessageDialog(program, "Could not print the specified document.", "Problem with printing", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(program, "Could not print the specified document.\n" + e.toString(), "Problem with printing", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 		else if(e.getSource() == newItemButton) {
@@ -4286,20 +4015,20 @@ public class InventoryApp extends JFrame implements MouseListener{
 			barcodeTextField.requestFocusInWindow();
 		}
 		else if(e.getSource() == yearRB) {
-			monthComboBox.setEnabled(false);
-			dayComboBox.setEnabled(false);
+			if(!reportType.equals("Snapshot")) {
+				monthComboBox.setEnabled(false);
+				dayComboBox.setEnabled(false);
+			}
 		}
 		else if(e.getSource() == monthRB) {
-			if(titleLabel.getText().equals("Check Out(-) Item Log") || titleLabel.getText().equals("Receive(+) Item Log")) {
-				monthComboBox.setEnabled(true);
+			monthComboBox.setEnabled(true);
+			if(!reportType.equals("Snapshot")) {
+				dayComboBox.setEnabled(false);
 			}
-			dayComboBox.setEnabled(false);
 		}
 		else if(e.getSource() == dayRB) {
-			if(!titleLabel.getText().equals("Reports")) {
-				monthComboBox.setEnabled(true);
-				dayComboBox.setEnabled(true);
-			}
+			monthComboBox.setEnabled(true);
+			dayComboBox.setEnabled(true);
 		}
 		else if(e.getSource() == checkOutRB) {
 			checkOutRB.setSelected(true);
@@ -4325,21 +4054,21 @@ public class InventoryApp extends JFrame implements MouseListener{
 				}
 			});
 		}
-		else if(e.getSource() == dateReportButton) {
-			reportType = "Date";
+		else if(e.getSource() == usageReportButton) {
+			reportType = "Usage";
 			chooseDate();
 			updateReports();
 			itemsTextArea.setCaretPosition(0);
 		}
-		else if(e.getSource() == userReportButton) {
-			reportType = "User";
-			chooseUser();
-			if(user != null) {
-				chooseDate();
-				updateReports();
-			}
+		else if(e.getSource() == snapshotReportButton) {
+			reportType = "Snapshot";
+			chooseDate();
+			updateReports();
 			itemsTextArea.setCaretPosition(0);
 		}
+		/*
+		 * Save this for future implementation
+		 * 
 		else if(e.getSource() == productReportButton) {
 			reportType = "Product";
 			chooseBarcodeOrKeyword();
@@ -4349,6 +4078,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 			}
 			itemsTextArea.setCaretPosition(0);
 		}
+		*/
 		else if(e.getSource() == userList) {
 			if(e.getClickCount() == 2 && userList.getSelectedIndex() != -1) {
 				Component component = (Component) e.getSource();
@@ -4369,7 +4099,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		        productName = productList.getSelectedValue();
 				if(productName != null) {
 					try {
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement = "SELECT p_id, p_name, instock, restock, kit FROM product WHERE p_name = '" + productName + "' ORDER BY p_name ASC;";
 				        r = s.executeQuery(sqlStatement);
@@ -4382,7 +4112,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException sqle) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.", "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.\n" + sqle.toString(), "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
 					}
 					finally {
 						try { s.close(); } catch (Exception e1) { /* ignored */ }
@@ -4397,8 +4127,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 			if(e.getClickCount() == 2 && sortByList.getSelectedIndex() != -1) {
 				Component component = (Component) e.getSource();
 		        JDialog dialog = (JDialog) SwingUtilities.getRoot(component);
-		        if(sortByList.getSelectedValue().equals("Not Installed")) {
-					sortByName = "Not Installed";
+		        if(sortByList.getSelectedValue().equals("Past 4 Weeks")) {
+					sortByName = "Past 4 Weeks";
 					sortByAndShow();
 				}
 				else if(sortByList.getSelectedValue().equals("Date")) {
@@ -4444,9 +4174,9 @@ public class InventoryApp extends JFrame implements MouseListener{
 		productName = null;
 		productLines.clear();
 		String itemSearchInput = barcodeInput;
-		String searchTermsString = createSearchTermsString(itemSearchInput);
+		String searchTermsString = createSearchTermsString(itemSearchInput, "");
 		try {	
-	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+	        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 			s = conn.createStatement();
 	        String sqlStatement = "SELECT p_name FROM product WHERE " + searchTermsString + " ORDER BY p_name ASC;";
 	        r = s.executeQuery(sqlStatement);
@@ -4455,7 +4185,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	        }
 		}
 		catch(SQLException e) {
-	    	JOptionPane.showMessageDialog(program, "There is a problem loading the products from the database.", "Could not load products from DB", JOptionPane.WARNING_MESSAGE);
+	    	JOptionPane.showMessageDialog(program, "There is a problem loading the products from the database.\n" + e.toString(), "Could not load products from DB", JOptionPane.WARNING_MESSAGE);
 		}
 		finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -4466,7 +4196,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		// get the kit items for all products
 		for(int i = 0; i < productLines.size(); i++) {
 			try {	
-		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+		        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 				s = conn.createStatement();
 		        String sqlStatement = "SELECT p2.p_name from ((product p1 LEFT JOIN kitItem ON p1.p_id = kit_product) LEFT JOIN product p2 ON p2.p_id = kitItem_product) WHERE p1.p_name = '" + productLines.get(i) + "';";
 		        r = s.executeQuery(sqlStatement);
@@ -4479,7 +4209,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		        }
 			}
 			catch(SQLException e) {
-		    	JOptionPane.showMessageDialog(program, "There is a problem loading the products from the database.", "Could not load products from DB", JOptionPane.WARNING_MESSAGE);
+		    	JOptionPane.showMessageDialog(program, "There is a problem loading the products from the database.\n" + e.toString(), "Could not load products from DB", JOptionPane.WARNING_MESSAGE);
 			}
 			finally {
 				try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -4494,7 +4224,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 		productList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		productList.setLayoutOrientation(JList.VERTICAL);
 		productList.setVisibleRowCount(-1);
-		productList.setFont(new Font("Arial", Font.BOLD, 28));
+		productList.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		productList.addMouseListener(this);
 		
 		productScrollPane = new JScrollPane(productList);
@@ -4504,7 +4234,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 	    productScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		productPanel = new JPanel();
-		productPanel.setFont(new Font("Arial", Font.BOLD, 28));
+		productPanel.setFont(new Font("Arial", Font.BOLD, screenSize.width/69));
 		productPanel.add(productScrollPane);
 		
 		int result;
@@ -4516,7 +4246,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					productName = productList.getSelectedValue();
 					validProduct = true;
 					try {
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 				        String sqlStatement = "SELECT p_id, p_name, instock, restock, kit FROM product WHERE p_name = '" + productName + "' ORDER BY p_name ASC;";
 				        r = s.executeQuery(sqlStatement);
@@ -4529,7 +4259,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException e) {
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.", "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.\n" + e.toString(), "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
 					}
 					finally {
 						try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -4545,7 +4275,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 						if(productName != null) {
 							validProduct = true;
 							try {
-						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+						        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 								s = conn.createStatement();
 						        String sqlStatement = "SELECT p_id, p_name, instock, restock, kit FROM product WHERE p_name = '" + productName + "' ORDER BY p_name ASC;";
 						        r = s.executeQuery(sqlStatement);
@@ -4558,7 +4288,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 						        }
 							}
 							catch(SQLException e) {
-						    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.", "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
+						    	JOptionPane.showMessageDialog(program, "There is a problem finding the item in the database.\n" + e.toString(), "Could not find item in DB", JOptionPane.WARNING_MESSAGE);
 							}
 							finally {
 								try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -4572,9 +4302,6 @@ public class InventoryApp extends JFrame implements MouseListener{
 					}
 				}
 			}
-		}
-		else {
-			JOptionPane.showMessageDialog(program, "There are no items matching this barcode or search query. Please try again.", "No match found", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 	
@@ -4599,7 +4326,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 				if(barcodeItem[4].equals("1")) {
 					boolean notEnoughItems = false;
 					try {
-				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+				        conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 						s = conn.createStatement();
 						String sqlStatement = "SELECT quantity, kitItem_product, p_name, instock FROM (kitItem LEFT JOIN product ON kitItem_product = p_id) WHERE kit_product = '" + barcodeItem[0] + "';";
 				        r = s.executeQuery(sqlStatement);
@@ -4620,8 +4347,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 				        }
 					}
 					catch(SQLException sqle) {
-						sqle.printStackTrace();
-				    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit in the database.", "Could not find kit in DB", JOptionPane.WARNING_MESSAGE);
+						
+				    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit in the database.\n" + sqle.toString(), "Could not find kit in DB", JOptionPane.WARNING_MESSAGE);
 					}
 					finally {
 						try { s.close(); } catch (Exception e1) { /* ignored */ }
@@ -4631,7 +4358,7 @@ public class InventoryApp extends JFrame implements MouseListener{
 					if(notEnoughItems) {
 		        		JOptionPane.showMessageDialog(program, "Could not check out this kit because there is no more stock for an item.", "Exceed stock quantity", JOptionPane.WARNING_MESSAGE);
 						try {
-							conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryAppUser;password=InventoryAppPassword;");
+							conn = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-QHQ11UT;database=Inventory;user=InventoryUser;password=InventoryPassword;");
 							s = conn.createStatement();
 							String sqlStatement = "SELECT quantity, kitItem_product, p_name, instock FROM (kitItem LEFT JOIN product ON kitItem_product = p_id) WHERE kit_product = '" + barcodeItem[0] + "';";
 					        r = s.executeQuery(sqlStatement);
@@ -4646,8 +4373,8 @@ public class InventoryApp extends JFrame implements MouseListener{
 					        }
 						}
 						catch(SQLException sqle) {
-							sqle.printStackTrace();
-					    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit in the database.", "Could not find kit in DB", JOptionPane.WARNING_MESSAGE);
+							
+					    	JOptionPane.showMessageDialog(program, "There is a problem finding the kit in the database.\n" + sqle.toString(), "Could not find kit in DB", JOptionPane.WARNING_MESSAGE);
 						}
 						finally {
 							try { s.close(); } catch (Exception e1) { /* ignored */ }
